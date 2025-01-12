@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApostaPro - Integração API-Football</title>
+    <!-- Link para Font Awesome (opcional para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link para Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Variáveis de Cores */
+        :root {
+            --color-primary: #1e3a8a; /* Azul escuro */
+            --color-secondary: #3b82f6; /* Azul médio */
+            --color-accent: #10b981; /* Verde */
+            --color-bg: #f3f4f6; /* Cinza claro */
+            --color-text: #1f2937; /* Cinza escuro */
+            --color-white: #ffffff;
+            --color-button-bg: #3b82f6;
+            --color-button-hover: #1e40af;
+            --color-button-text: #ffffff;
+        }
+
+        /* Estilos do Header */
+        header {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 20px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Estilos do Main */
+        main {
+            padding: 20px;
+        }
+
+        /* Seção de Seleção de Liga */
+        .league-selection {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .league-selection label {
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .league-selection select {
+            padding: 8px;
+            border: 1px solid var(--color-secondary);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .league-selection button {
+            padding: 8px 16px;
+            background-color: var(--color-button-bg);
+            color: var(--color-button-text);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .league-selection button:hover {
+            background-color: var(--color-button-hover);
+        }
+
+        /* Container das Partidas */
+        #matches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Cartão de Partida */
+        .match-card {
+            background-color: var(--color-white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .match-card h3 {
+            margin-bottom: 10px;
+            color: var(--color-primary);
+        }
+
+        .match-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .match-time {
+            font-weight: bold;
+            color: var(--color-secondary);
+        }
+
+        /* Estilos do Footer */
+        footer {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .league-selection {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            footer {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ApostaPro - Partidas da Liga</h1>
+    </header>
+    
+    <main>
+        <section class="league-selection">
+            <label for="league">Selecione a Liga:</label>
+            <select id="league">
+                <option value="">--Escolha uma Liga--</option>
+                <option value="39">Premier League (Inglaterra)</option>
+                <option value="140">La Liga (Espanha)</option>
+                <option value="78">Serie A (Itália)</option>
+                <option value="135">Bundesliga (Alemanha)</option>
+                <option value="61">Ligue 1 (França)</option>
+                <option value="80">Primeira Liga (Portugal)</option>
+                <!-- Adicione mais ligas conforme necessário -->
+            </select>
+            <button id="fetch-btn">Buscar Partidas</button>
+        </section>
+
+        <section id="matches-container">
+            <!-- As partidas serão exibidas aqui -->
+        </section>
+    </main>
+
+    <footer>
+        © 2025 ApostaPro. Todos os direitos reservados.
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Sua chave de API-Football
+        const API_KEY = 'b77014eeea8142d354a2e0479bcc2d08';
+        const API_HOST = 'v3.football.api-sports.io';
+
+        // Função para buscar partidas de uma liga específica
+        const fetchMatches = async (leagueId) => {
+            const season = 2023; // Ajuste o ano conforme necessário
+            const url = `https://${API_HOST}/fixtures?league=${leagueId}&season=${season}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'x-apisports-key': API_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.response && data.response.length > 0) {
+                    displayMatches(data.response);
+                } else {
+                    document.getElementById('matches-container').innerHTML = '<p>Nenhuma partida encontrada para esta liga.</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar partidas:', error);
+                document.getElementById('matches-container').innerHTML = `<p>Ocorreu um erro ao buscar partidas: ${error.message}</p>`;
+            }
+        };
+
+        // Função para exibir as partidas na página
+        const displayMatches = (matches) => {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = ''; // Limpa o conteúdo anterior
+
+            matches.forEach(match => {
+                const matchDate = new Date(match.fixture.date);
+                const hours = matchDate.getHours().toString().padStart(2, '0');
+                const minutes = matchDate.getMinutes().toString().padStart(2, '0');
+                const time = `${hours}:${minutes}`;
+
+                const matchCard = document.createElement('div');
+                matchCard.classList.add('match-card');
+
+                matchCard.innerHTML = `
+                    <h3>${match.league.name}</h3>
+                    <div class="match-details">
+                        <div class="team">
+                            <img src="${match.teams.home.logo}" alt="${match.teams.home.name}">
+                            <span>${match.teams.home.name}</span>
+                        </div>
+                        <span>VS</span>
+                        <div class="team">
+                            <img src="${match.teams.away.logo}" alt="${match.teams.away.name}">
+                            <span>${match.teams.away.name}</span>
+                        </div>
+                    </div>
+                    <div class="match-time">
+                        <i class="fas fa-clock"></i> ${time} 
+                    </div>
+                `;
+
+                container.appendChild(matchCard);
+            });
+        };
+
+        // Event listener para o botão de buscar partidas
+        document.getElementById('fetch-btn').addEventListener('click', () => {
+            const leagueSelect = document.getElementById('league');
+            const leagueId = leagueSelect.value;
+
+            if (leagueId) {
+                fetchMatches(leagueId);
+            } else {
+                alert('Por favor, selecione uma liga.');
+            }
+        });
+    </script>
+</body>
+</html>
