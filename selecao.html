@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Seleções - ApostaPro</title>
+    <!-- Link para ícones (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico para garantir consistência entre navegadores */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Variáveis de cores para facilitar a manutenção e consistência */
+        :root {
+            --cor-primaria: #1e3a8a; /* Azul escuro */
+            --cor-secundaria: #3b82f6; /* Azul médio */
+            --cor-accent: #10b981; /* Verde */
+            --cor-fundo: #f3f4f6; /* Cinza claro */
+            --cor-texto: #1f2937; /* Cinza escuro */
+            --cor-branca: #ffffff;
+            --cor-filtro-fundo: #ffffff;
+            --cor-filtro-borda: #d1d5db;
+            --cor-botao-fundo: #3b82f6;
+            --cor-botao-hover: #1e40af;
+            --cor-botao-texto: #ffffff;
+            --cor-botao-secundario-fundo: #e5e7eb;
+            --cor-botao-secundario-texto: #374151;
+            --cor-cartao-borda: #d1d5db;
+            --cor-cartao-hover: #e5e7eb;
+            --cor-tabela-cabecalho: #3b82f6;
+            --cor-tabela-texto: #1f2937;
+            --cor-tabela-borda: #d1d5db;
+            --cor-cabecalho-fundo: var(--cor-branca);
+            --cor-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+            --cor-sidebar-fundo: var(--cor-primaria);
+            --cor-sidebar-ativa: var(--cor-secundaria);
+            --cor-sucesso-borda: #10b981; /* Verde para acerto */
+            --cor-erro-borda: #ef4444; /* Vermelho para erro */
+        }
+
+        /* Estilos para a Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px; /* Largura da sidebar */
+            height: 100%;
+            background-color: var(--cor-sidebar-fundo);
+            color: var(--cor-branca);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--cor-sidebar-ativa);
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            /* Mantendo apenas o texto do logo */
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--cor-branca);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none; /* Esconder em desktop */
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding-top: 20px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--cor-branca);
+            text-decoration: none;
+            transition: background 0.2s;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--cor-sidebar-ativa);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+        }
+
+        /* Overlay para mobile */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px; /* Ajustar conforme a largura da sidebar */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--cor-fundo);
+            transition: margin-left 0.3s ease-in-out;
+            padding: 20px; /* Adicionar padding para não ficar grudado nas bordas */
+            overflow-y: auto;
+        }
+
+        /* Cabeçalho */
+        .header {
+            height: 70px; /* Aumento da altura para acomodar novos elementos */
+            background-color: var(--cor-cabecalho-fundo);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 4px var(--cor-cabecalho-sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* Botão de Menu para Mobile */
+        .menu-btn {
+            display: none; /* Esconder em desktop */
+            background: none;
+            border: none;
+            color: var(--cor-texto);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Logo no Cabeçalho */
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--cor-primaria);
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Barra de Busca */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            max-width: 500px;
+            margin: 0 30px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--cor-filtro-borda);
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+            font-size: 1rem;
+            color: var(--cor-texto);
+        }
+
+        .search-bar button {
+            padding: 10px 15px;
+            border: none;
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .search-bar button:hover {
+            background-color: var(--cor-botao-hover);
+        }
+
+        /* Ícones de Notificação e Perfil */
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            color: var(--cor-texto);
+            font-size: 1.4rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .notification-icon:hover {
+            color: var(--cor-secundaria);
+        }
+
+        .icon-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: var(--cor-accent);
+            color: var(--cor-branca);
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+        }
+
+        /* Dropdown do Perfil */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown a {
+            color: var(--cor-texto);
+            font-size: 1.8rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .profile-dropdown a:hover {
+            color: var(--cor-secundaria);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--cor-branca);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .dropdown-content a {
+            color: var(--cor-texto);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--cor-filtro-fundo);
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Cards */
+        .analysis-card {
+            background-color: var(--cor-branca);
+            padding: 20px;
+            border-radius: 12px; /* Aumento do border-radius */
+            border: 2px solid var(--cor-cartao-borda);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Melhoria na sombra */
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Classes para indicar resultado */
+        .analysis-card.resultado-ganhou {
+            border-color: var(--cor-sucesso-borda);
+            background-color: rgba(16, 185, 129, 0.05); /* Verde claro */
+        }
+
+        .analysis-card.resultado-perdeu {
+            border-color: var(--cor-erro-borda);
+            background-color: rgba(239, 68, 68, 0.05); /* Vermelho claro */
+        }
+
+        .analysis-card h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            color: var(--cor-texto);
+            margin-bottom: 10px;
+        }
+
+        .analysis-card p {
+            color: #4b5563;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            font-size: 0.9rem;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        /* Botões Remover */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .card-actions button {
+            background: none;
+            border: none;
+            color: var(--cor-primaria);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: color 0.3s, background-color 0.3s;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .card-actions button:hover {
+            color: var(--cor-secundaria);
+            background-color: var(--cor-cartao-hover);
+        }
+
+        .card-actions button i {
+            margin-right: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            height: 40px; /* Redução da altura do rodapé */
+            background-color: var(--cor-primaria);
+            color: var(--cor-branca);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .search-bar {
+                margin: 0 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .overlay.active {
+                display: block;
+            }
+
+            .close-btn {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .feed {
+                padding: 10px;
+            }
+
+            /* Ajustes no cabeçalho para dispositivos móveis */
+            .search-bar {
+                margin: 0 10px;
+                max-width: 300px;
+            }
+
+            /* Botão de Menu visível apenas em mobile */
+            .menu-btn {
+                display: block;
+            }
+
+            /* Ajustes adicionais para os botões na versão mobile */
+            .card-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .card-actions button {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 10px;
+            }
+
+            .search-bar {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            /* Aumento do espaçamento entre o cabeçalho e as dicas */
+            .feed {
+                margin-top: 20px; /* Ajuste conforme necessário */
+            }
+        }
+
+        /* Adição de espaçamento entre o cabeçalho e as dicas para telas maiores */
+        @media (min-width: 769px) {
+            .feed {
+                margin-top: 30px; /* Ajuste conforme necessário */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">Super Tip</h1>
+            <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="index2.html" aria-label="Home">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="analise.html" aria-label="Análises">
+                        <i class="fas fa-chart-bar"></i>
+                        Análises
+                    </a>
+                </li>
+                <li>
+                    <a href="jogos.html" aria-label="Explorar">
+                        <i class="fas fa-compass"></i>
+                        Explorar
+                    </a>
+                </li>
+                <li>
+                    <a href="selecao.html" aria-label="Minhas Seleções">
+                        <i class="fas fa-list"></i>
+                        Minhas Seleções
+                    </a>
+                </li>
+                <li>
+                    <a href="#" aria-label="Perfil">
+                        <i class="fas fa-user"></i>
+                        Perfil
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="logout-btn" aria-label="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Overlay para mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <!-- Botão de Menu para Mobile -->
+            <button class="menu-btn" id="menu-btn" aria-label="Abrir Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Logo no Cabeçalho -->
+            <div class="header-logo">
+                <a href="index2.html" aria-label="ApostaPro Home">
+                    <span class="logo-text">ApostaPro</span>
+                </a>
+            </div>
+            <!-- Barra de Busca -->
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Buscar análises ou tipsters..." aria-label="Buscar">
+                <button id="search-btn" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <!-- Ícones de Notificação e Perfil -->
+            <div class="header-icons">
+                <a href="#" class="notification-icon" aria-label="Notificações">
+                    <i class="fas fa-bell"></i>
+                    <span class="icon-badge" id="notification-badge">3</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="#" aria-label="Perfil">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="#">Meu Perfil</a>
+                        <a href="#">Configurações</a>
+                        <a href="#" class="logout-btn">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Feed de Seleções -->
+        <main class="feed" id="feed">
+            <!-- As seleções serão inseridas aqui dinamicamente -->
+            <div id="selecoes-container"></div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            © 2025 ApostaPro. Todos os direitos reservados.
+        </footer>
+    </div>
+
+    <!-- Firebase SDK (Abordagem Modular) -->
+    <script type="module">
+        // Importar as funções necessárias do SDK do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            getDocs, 
+            setDoc, 
+            deleteDoc, 
+            getDoc, 
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8147QhLWMcT0NdJGMCZhxS1nDpTOErpI",
+            authDomain: "superpro-8d45e.firebaseapp.com",
+            projectId: "superpro-8d45e",
+            storageBucket: "superpro-8d45e.appspot.com",
+            messagingSenderId: "732335019424",
+            appId: "1:732335019424:web:5a743efffe3d62cc9980c5"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const bancoDeDados = getFirestore(app);
+        const autenticacao = getAuth(app);
+
+        // Variáveis para armazenamento de dados
+        let dicasSelecionadas = [];
+
+        // ------------------- FORMATAR PRIMEIRA LETRA -------------------
+        const capitalizeFirstLetter = (string) => {
+            if (typeof string !== 'string') return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
+        // ------------------- INICIALIZAR ESTRUTURA DO FIRESTORE -------------------
+        const inicializarEstruturaDoFirestore = async (usuario) => {
+            if (!usuario) return;
+
+            const idDoUsuario = usuario.uid;
+            const referenciaDoUsuario = doc(bancoDeDados, 'users', idDoUsuario);
+            const documentoDoUsuario = await getDoc(referenciaDoUsuario);
+
+            if (!documentoDoUsuario.exists()) {
+                // Criar documento de usuário se não existir
+                await setDoc(referenciaDoUsuario, {
+                    email: usuario.email,
+                    criadoEm: serverTimestamp()
+                    // Adicione outros campos necessários aqui
+                });
+                console.log(`Documento de usuário criado para UID: ${idDoUsuario}`);
+            } else {
+                console.log(`Documento de usuário já existe para UID: ${idDoUsuario}`);
+            }
+        };
+
+        // ------------------- BUSCAR E PROCESSAR CSV -------------------
+        const urlDaPlanilha = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWlGNMaJfx6YMl0NaV2SIfCCKXxnP4Z51nXI62n0pG-qhHfQsHldYN4eYOtxanC2h2NzyzIfAHH8ax/pub?output=csv';
+
+        const buscarEProcessarCSV = () => {
+            fetch(urlDaPlanilha)
+                .then(resposta => {
+                    if (!resposta.ok) {
+                        throw new Error(`Erro na requisição: ${resposta.status}`);
+                    }
+                    return resposta.text();
+                })
+                .then(textoCSV => {
+                    const dadosProcessados = processarCSV(textoCSV);
+                    console.log('Resultados do CSV:', dadosProcessados);
+                    renderizarSelecoesAPartirDoCSV(dadosProcessados);
+                })
+                .catch(erro => {
+                    console.error('Erro ao buscar ou processar o CSV:', erro);
+                    alert("Ocorreu um erro ao carregar as dicas. Por favor, tente novamente.");
+                });
+        };
+
+        // ------------------- PARSE MANUAL DO CSV -------------------
+        const processarCSV = (textoCSV) => {
+            const linhas = textoCSV.trim().split('\n');
+            const cabecalhos = linhas[0].split(',');
+
+            const resultado = [];
+
+            for (let i = 1; i < linhas.length; i++) {
+                const objeto = {};
+                const linhaAtual = linhas[i].split(',');
+
+                for (let j = 0; j < cabecalhos.length; j++) {
+                    // Remove possíveis aspas e espaços
+                    const cabecalho = cabecalhos[j].trim().replace(/^"|"$/g, '');
+                    const valor = linhaAtual[j] ? linhaAtual[j].trim().replace(/^"|"$/g, '') : '';
+                    objeto[cabecalho] = valor;
+                }
+
+                resultado.push(objeto);
+            }
+
+            return resultado;
+        };
+
+        // ------------------- RENDERIZAR SELEÇÕES A PARTIR DO CSV -------------------
+        const renderizarSelecoesAPartirDoCSV = async (dicas) => {
+            const container = document.getElementById('selecoes-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            // Verificar se o usuário está autenticado
+            const usuario = autenticacao.currentUser;
+            if (!usuario) {
+                container.innerHTML = '<p>Por favor, faça login para ver suas seleções.</p>';
+                return;
+            }
+
+            const idDoUsuario = usuario.uid;
+
+            // Obter as seleções do usuário
+            const referenciaDasSelecoes = collection(bancoDeDados, 'users', idDoUsuario, 'selecoes');
+            const snapshotDasSelecoes = await getDocs(referenciaDasSelecoes);
+
+            if (snapshotDasSelecoes.empty) {
+                container.innerHTML = '<p>Você ainda não selecionou nenhuma dica.</p>';
+                return;
+            }
+
+            const idsDasDicasSelecionadas = [];
+            snapshotDasSelecoes.forEach((documentSnapshot) => {
+                idsDasDicasSelecionadas.push(documentSnapshot.id);
+            });
+
+            console.log(`Dicas selecionadas: ${idsDasDicasSelecionadas.join(', ')}`);
+
+            // Filtrar as dicas do CSV que estão nas seleções do usuário
+            const dicasFiltradas = dicas.filter(dica => idsDasDicasSelecionadas.includes(dica.ID));
+
+            if (dicasFiltradas.length === 0) {
+                container.innerHTML = '<p>Você ainda não selecionou nenhuma dica válida.</p>';
+                return;
+            }
+
+            dicasSelecionadas = dicasFiltradas; // Atualizar a variável global para uso posterior
+
+            dicasFiltradas.forEach(dica => {
+                console.log('Dica:', dica); // Para depuração
+
+                // Acessando os campos com os nomes corretos
+                const titulo = dica['Título da Dica'] || 'Título não disponível';
+                const conteudo = dica['Conteúdo da Dica'] || 'Conteúdo não disponível';
+                const odd = dica['Odd'] !== undefined ? dica['Odd'] : 0;
+                const resultado = dica['Resultado'] ? dica['Resultado'].toLowerCase().trim() : '';
+                const autor = dica['Autor'] || 'Autor não disponível';
+                const data = dica['Data'] || 'Data não disponível';
+
+                // Determinar a classe de resultado para a borda
+                let classeDoResultado = '';
+                if (resultado === 'ganhou') {
+                    classeDoResultado = 'resultado-ganhou';
+                } else if (resultado === 'perdeu') {
+                    classeDoResultado = 'resultado-perdeu';
+                }
+
+                // Criar o card
+                const card = document.createElement('div');
+                card.classList.add('analysis-card'); // Sempre adicionar 'analysis-card'
+                if (classeDoResultado !== '') {
+                    card.classList.add(classeDoResultado); // Adicionar 'resultado-ganhou' ou 'resultado-perdeu' somente se não estiver vazio
+                }
+
+                // Verificar se os campos estão sendo preenchidos corretamente
+                console.log(`Título: ${titulo}`);
+                console.log(`Conteúdo: ${conteudo}`);
+                console.log(`Odd: ${odd}`);
+                console.log(`Autor: ${autor}`);
+                console.log(`Data: ${data}`);
+                console.log(`Resultado: ${resultado}`);
+
+                card.innerHTML = `
+                    <h2>${titulo}</h2>
+                    <p>${conteudo}</p>
+                    <p><strong>Odd:</strong> ${odd}</p>
+                    <p><strong>Resultado:</strong> ${capitalizeFirstLetter(resultado)}</p>
+                    <div class="card-footer">
+                        <span><strong>Tipster:</strong> ${autor}</span>
+                        <span><strong>Publicado em:</strong> ${formatarData(data)}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button onclick="removerSelecao('${dica.ID}')" id="remove-btn-${dica.ID}">
+                            <i class="fas fa-minus"></i> Remover
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        // ------------------- FORMATAR DATA -------------------
+        const formatarData = (stringData) => {
+            if (!stringData) return 'Data inválida';
+            const partes = stringData.split('/');
+            if (partes.length !== 3) return stringData;
+            const [dia, mes, ano] = partes;
+            return `${dia}/${mes}/${ano}`;
+        };
+
+        // ------------------- FUNÇÕES DE REMOVER SELEÇÃO -------------------
+        window.removerSelecao = async (idDaDica) => {
+            const usuario = autenticacao.currentUser;
+            if (!usuario) {
+                alert("Por favor, faça login para remover seleções.");
+                return;
+            }
+
+            const idDoUsuario = usuario.uid;
+            const referenciaDaSelecao = doc(bancoDeDados, 'users', idDoUsuario, 'selecoes', idDaDica);
+
+            try {
+                await deleteDoc(referenciaDaSelecao);
+                // Recarregar as seleções
+                buscarEProcessarCSV();
+                alert("Seleção removida com sucesso!");
+                console.log(`Dica ID: ${idDaDica} removida das seleções.`);
+            } catch (erro) {
+                console.error('Erro ao remover seleção:', erro);
+                alert("Ocorreu um erro ao remover sua seleção. Por favor, tente novamente.");
+            }
+        };
+
+        // ------------------- AUTENTICAÇÃO -------------------
+        // Atualizar UI com base no estado de autenticação
+        const atualizarInterfaceAutenticacao = (usuario) => {
+            const botoesDeLogout = document.querySelectorAll('.logout-btn');
+            botoesDeLogout.forEach(btn => {
+                if (usuario) {
+                    btn.textContent = "Sair";
+                    btn.href = "#";
+                    btn.onclick = async (evento) => {
+                        evento.preventDefault();
+                        await efetuarLogout();
+                    };
+                } else {
+                    btn.textContent = "Login";
+                    btn.href = "login.html"; // Redirecionar para a página de login
+                }
+            });
+        };
+
+        // Função para efetuar logout
+        const efetuarLogout = async () => {
+            try {
+                await signOut(autenticacao);
+                alert("Logout realizado com sucesso!");
+                console.log("Usuário deslogado.");
+            } catch (erro) {
+                console.error('Erro ao fazer logout:', erro);
+                alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
+            }
+        };
+
+        // Listener para mudanças no estado de autenticação
+        onAuthStateChanged(autenticacao, async (usuario) => {
+            console.log('onAuthStateChanged chamado. Usuário:', usuario);
+            if (usuario) {
+                console.log(`Usuário autenticado: ${usuario.uid}`);
+                await inicializarEstruturaDoFirestore(usuario);
+                // Carregar seleções somente após o usuário estar autenticado
+                buscarEProcessarCSV();
+            } else {
+                console.log('Nenhum usuário autenticado');
+                const container = document.getElementById('selecoes-container');
+                if (container) {
+                    container.innerHTML = '<p>Por favor, faça login para ver suas seleções.</p>';
+                }
+            }
+            atualizarInterfaceAutenticacao(usuario);
+        });
+
+        // ------------------- INICIALIZAÇÃO -------------------
+        const inicializarPagina = () => {
+            // Sidebar toggle para mobile
+            const botaoMenu = document.getElementById('menu-btn');
+            const botaoFechar = document.getElementById('close-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            if (botaoMenu) {
+                botaoMenu.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                });
+            }
+
+            if (botaoFechar) {
+                botaoFechar.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        };
+
+        window.onload = () => {
+            inicializarPagina(); // Função já existente para a Sidebar
+            // buscarEProcessarCSV(); // Agora chamado após autenticação
+        };
+    </script>
+</body>
+</html>

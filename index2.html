@@ -19,7 +19,7 @@
             font-family: 'Roboto', sans-serif;
         }
 
-        /* Variáveis de cores */
+        /* Variáveis de cores para facilitar a manutenção e consistência */
         :root {
             --color-primary: #1e3a8a; /* Azul escuro */
             --color-secondary: #3b82f6; /* Azul médio */
@@ -39,6 +39,8 @@
             --color-table-header: #3b82f6;
             --color-table-text: #1f2937;
             --color-table-border: #d1d5db;
+            --color-success-border: #10b981; /* Verde para acerto */
+            --color-error-border: #ef4444; /* Vermelho para erro */
         }
 
         /* Estilos para a Sidebar */
@@ -150,7 +152,7 @@
             z-index: 100;
         }
 
-        /* Remover a imagem do logo no cabeçalho */
+        /* Logo no Cabeçalho */
         .header-logo {
             display: flex;
             align-items: center;
@@ -334,7 +336,7 @@
             background-color: var(--color-white);
             padding: 20px;
             border-radius: 12px; /* Aumento do border-radius */
-            border: 1px solid var(--color-card-border);
+            border: 2px solid var(--color-card-border);
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Melhoria na sombra */
             margin-bottom: 20px;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -344,6 +346,15 @@
         .analysis-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Classes para indicar resultado */
+        .analysis-card.resultado-ganhou {
+            border-color: var(--color-success-border);
+        }
+
+        .analysis-card.resultado-perdeu {
+            border-color: var(--color-error-border);
         }
 
         .analysis-card h2 {
@@ -367,7 +378,7 @@
             margin-top: 15px;
         }
 
-        /* Botões Curtir e Comentar */
+        /* Botões Selecionar */
         .card-actions {
             display: flex;
             gap: 10px;
@@ -382,75 +393,28 @@
             display: flex;
             align-items: center;
             font-size: 0.9rem;
-            transition: color 0.2s;
+            transition: color 0.2s, background-color 0.2s;
+            padding: 8px 12px;
+            border-radius: 4px;
         }
 
         .card-actions button:hover {
             color: var(--color-secondary);
+            background-color: var(--color-card-hover);
         }
 
         .card-actions button i {
             margin-right: 5px;
         }
 
-        /* Seção de Comentários */
-        .comments-section {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f9fafb;
-            border-radius: 4px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .comments-list {
-            max-height: 150px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-
-        .comment {
-            padding: 5px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .comment:last-child {
-            border-bottom: none;
-        }
-
-        .comment strong {
-            margin-right: 5px;
-        }
-
-        .comments-section input {
-            width: 80%;
-            padding: 8px;
-            border: 1px solid var(--color-filter-border);
-            border-radius: 4px;
-            outline: none;
-            margin-right: 5px;
-        }
-
-        .comments-section button {
-            padding: 8px 12px;
-            background-color: var(--color-button-bg);
-            color: var(--color-button-text);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .comments-section button:hover {
-            background-color: var(--color-button-hover);
-        }
-
-        /* Botões Curtir e Favoritar Ativos */
-        .button-liked {
-            color: var(--color-accent);
-        }
-
+        /* Botão Selecionar Ativo */
         .button-favorited {
-            color: var(--color-accent);
+            background-color: var(--color-accent);
+            color: var(--color-white);
+        }
+
+        .button-favorited:hover {
+            background-color: var(--color-accent);
         }
 
         /* Footer */
@@ -462,6 +426,7 @@
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
+            margin-top: auto;
         }
 
         /* Responsividade */
@@ -508,6 +473,18 @@
             .search-bar {
                 display: flex; /* Manter a barra de busca visível */
             }
+
+            /* Aumento do espaçamento entre o cabeçalho e as dicas */
+            .feed {
+                margin-top: 20px; /* Ajuste conforme necessário */
+            }
+        }
+
+        /* Aumento do espaçamento entre o cabeçalho e as dicas para telas maiores */
+        @media (min-width: 769px) {
+            .feed {
+                margin-top: 30px; /* Ajuste conforme necessário */
+            }
         }
     </style>
 
@@ -527,7 +504,11 @@
             onSnapshot, 
             orderBy, 
             getDoc, 
-            serverTimestamp 
+            serverTimestamp,
+            addDoc,
+            updateDoc,
+            increment,
+            writeBatch
         } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { 
             getAuth, 
@@ -556,494 +537,418 @@
         const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWlGNMaJfx6YMl0NaV2SIfCCKXxnP4Z51nXI62n0pG-qhHfQsHldYN4eYOtxanC2h2NzyzIfAHH8ax/pub?output=csv';
 
         // Variáveis para armazenamento de dados e filtros
-        let allTips = [];
-        let filteredTips = [];
+        let todasAsDicas = [];
+        let dicasFiltradas = [];
 
         // ------------------- INICIALIZAR ESTRUTURA DO FIRESTORE -------------------
-        const initializeFirestoreStructure = async (user) => {
-            if (!user) return;
+        const inicializarEstruturaFirestore = async (usuario) => {
+            if (!usuario) return;
 
-            const userId = user.uid;
-            const userDocRef = doc(db, 'users', userId);
-            const userDoc = await getDoc(userDocRef);
+            const usuarioId = usuario.uid;
+            const referenciaDocumentoUsuario = doc(db, 'users', usuarioId);
+            const documentoUsuario = await getDoc(referenciaDocumentoUsuario);
 
-            if (!userDoc.exists()) {
+            if (!documentoUsuario.exists()) {
                 // Criar documento de usuário se não existir
-                await setDoc(userDocRef, {
-                    email: user.email,
+                await setDoc(referenciaDocumentoUsuario, {
+                    email: usuario.email,
                     createdAt: serverTimestamp()
                     // Adicione outros campos necessários aqui
                 });
-                console.log(`Documento de usuário criado para UID: ${userId}`);
+                console.log(`Documento de usuário criado para UID: ${usuarioId}`);
             } else {
-                console.log(`Documento de usuário já existe para UID: ${userId}`);
+                console.log(`Documento de usuário já existe para UID: ${usuarioId}`);
             }
         };
 
         // ------------------- BUSCAR DADOS DA PLANILHA -------------------
-        const fetchTipsFromSheet = async () => {
+        const buscarDicasDaPlanilha = async () => {
             try {
-                const response = await fetch(sheetURL);
-                if (!response.ok) {
-                    throw new Error(`Erro ao buscar dados: ${response.statusText}`);
+                const resposta = await fetch(sheetURL);
+                if (!resposta.ok) {
+                    throw new Error(`Erro ao buscar dados: ${resposta.statusText}`);
                 }
-                const csvData = await response.text();
-                console.log("Dados CSV recebidos:", csvData); // Debug
-                const tips = parseCSV(csvData);
-                console.log("Dicas parseadas:", tips); // Debug
+                const dadosCSV = await resposta.text();
+                console.log("Dados CSV recebidos:", dadosCSV); // Debug
+                const dicas = parsearCSV(dadosCSV);
+                console.log("Dicas parseadas:", dicas); // Debug
 
-                allTips = tips;
-                populateTipsterFilter(tips);
-                renderTips(allTips);
+                todasAsDicas = dicas;
+                preencherFiltroTipster(dicas);
+                await garantirDocumentosDeDicas(dicas); // Garantir que os documentos de dicas existam
+                renderizarDicas(todasAsDicas);
 
-            } catch (error) {
-                console.error('Erro ao buscar dicas:', error);
+            } catch (erro) {
+                console.error('Erro ao buscar dicas:', erro);
                 document.getElementById('tips-container').innerHTML = 
                     '<p>Erro ao carregar as dicas. Por favor, tente novamente mais tarde.</p>';
             }
         };
 
         // Função simples para converter CSV em array de objetos
-        const parseCSV = (csv) => {
-            const lines = csv.split('\n').filter(line => line.trim() !== '');
-            const headers = lines[0].split(',').map(header => header.trim());
+        const parsearCSV = (csv) => {
+            const linhas = csv.split('\n').filter(linha => linha.trim() !== '');
+            const cabecalhos = linhas[0].split(',').map(cabecalho => cabecalho.trim());
 
-            const data = lines.slice(1).map(line => {
-                const values = line.split(',').map(value => value.trim());
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = values[index] || '';
+            const dados = linhas.slice(1).map(linha => {
+                const valores = linha.split(',').map(valor => valor.trim());
+                const objeto = {};
+                cabecalhos.forEach((cabecalho, indice) => {
+                    objeto[cabecalho] = valores[indice] || '';
                 });
-                return obj;
+                return objeto;
             });
 
-            return data;
+            return dados;
+        };
+
+        // ------------------- GARANTIR DOCUMENTOS DE DICAS -------------------
+        const garantirDocumentosDeDicas = async (dicas) => {
+            const lote = writeBatch(db);
+
+            dicas.forEach(dica => {
+                const dicaId = dica['ID'];
+                const referenciaDocumentoDica = doc(db, 'dicas', dicaId);
+                lote.set(referenciaDocumentoDica, {
+                    titulo: dica['Título da Dica'],
+                    conteudo: dica['Conteúdo da Dica'],
+                    odd: parseFloat(dica['Odd']) || 0,
+                    resultado: dica['Resultado'] ? dica['Resultado'].toLowerCase().trim() : '',
+                    autor: dica['Autor'],
+                    data: dica['Data']
+                }, { merge: true }); // Usar merge para não sobrescrever campos existentes
+            });
+
+            try {
+                await lote.commit();
+                console.log('Documentos de dicas garantidos no Firestore.');
+            } catch (erro) {
+                console.error('Erro ao garantir documentos de dicas:', erro);
+            }
         };
 
         // ------------------- FILTROS -------------------
-        const populateTipsterFilter = (tips) => {
-            const tipsterSet = new Set(tips.map(tip => tip['Autor']));
-            const filterTipster = document.getElementById('filter-tipster');
-            tipsterSet.forEach(tipster => {
-                const option = document.createElement('option');
-                option.value = tipster;
-                option.textContent = tipster;
-                filterTipster.appendChild(option);
+        const preencherFiltroTipster = (dicas) => {
+            const conjuntoTipsters = new Set(dicas.map(dica => dica['Autor']));
+            const filtroTipster = document.getElementById('filter-tipster');
+            conjuntoTipsters.forEach(tipster => {
+                const opcao = document.createElement('option');
+                opcao.value = tipster;
+                opcao.textContent = tipster;
+                filtroTipster.appendChild(opcao);
             });
         };
 
-        const applyFilters = () => {
-            const selectedTipster = document.getElementById('filter-tipster').value;
-            const selectedDate = document.getElementById('filter-date').value;
+        const aplicarFiltros = () => {
+            const tipsterSelecionado = document.getElementById('filter-tipster').value;
+            const dataSelecionada = document.getElementById('filter-date').value;
 
-            filteredTips = allTips.filter(tip => {
-                let isValid = true;
+            dicasFiltradas = todasAsDicas.filter(dica => {
+                let valido = true;
 
                 // Filtro por tipster
-                if (selectedTipster !== 'all') {
-                    isValid = isValid && (tip['Autor'] === selectedTipster);
+                if (tipsterSelecionado !== 'all') {
+                    valido = valido && (dica['Autor'] === tipsterSelecionado);
                 }
 
                 // Filtro por data
-                if (selectedDate) {
-                    const tipDate = parseDate(tip['Data']);
-                    const filterDate = new Date(selectedDate);
-                    isValid = isValid && (
-                        tipDate.getFullYear() === filterDate.getFullYear() &&
-                        tipDate.getMonth() === filterDate.getMonth() &&
-                        tipDate.getDate() === filterDate.getDate()
+                if (dataSelecionada) {
+                    const dataDica = parsearData(dica['Data']);
+                    const dataFiltro = new Date(dataSelecionada);
+                    valido = valido && (
+                        dataDica.getFullYear() === dataFiltro.getFullYear() &&
+                        dataDica.getMonth() === dataFiltro.getMonth() &&
+                        dataDica.getDate() === dataFiltro.getDate()
                     );
                 }
 
-                return isValid;
+                return valido;
             });
 
-            renderTips(filteredTips);
+            renderizarDicas(dicasFiltradas);
         };
 
-        const clearFilters = () => {
+        const limparFiltros = () => {
             document.getElementById('filter-tipster').value = 'all';
             document.getElementById('filter-date').value = '';
-            filteredTips = allTips;
-            renderTips(filteredTips);
+            dicasFiltradas = todasAsDicas;
+            renderizarDicas(dicasFiltradas);
         };
 
         // ------------------- RENDERIZAR DICAS -------------------
-        const renderTips = (tips) => {
-            const tipsContainer = document.getElementById('tips-container');
-            tipsContainer.innerHTML = '';
+        const renderizarDicas = (dicas) => {
+            const containerDicas = document.getElementById('tips-container');
+            containerDicas.innerHTML = '';
 
-            if (tips.length === 0) {
-                tipsContainer.innerHTML = '<p>Nenhuma dica encontrada com os filtros selecionados.</p>';
+            if (dicas.length === 0) {
+                containerDicas.innerHTML = '<p>Nenhuma dica encontrada com os filtros selecionados.</p>';
                 return;
             }
 
             // Agrupar dicas por data
-            const tipsByDate = tips.reduce((acc, tip) => {
-                const dateKey = formatDate(tip['Data']);
-                if (!acc[dateKey]) {
-                    acc[dateKey] = [];
+            const dicasPorData = dicas.reduce((acumulador, dica) => {
+                const chaveData = formatarData(dica['Data']);
+                if (!acumulador[chaveData]) {
+                    acumulador[chaveData] = [];
                 }
-                acc[dateKey].push(tip);
-                return acc;
+                acumulador[chaveData].push(dica);
+                return acumulador;
             }, {});
 
             // Ordenar datas (mais recentes primeiro)
-            const sortedDates = Object.keys(tipsByDate).sort((a, b) => {
-                const dateA = new Date(a.split('/').reverse().join('-'));
-                const dateB = new Date(b.split('/').reverse().join('-'));
-                return dateB - dateA;
+            const datasOrdenadas = Object.keys(dicasPorData).sort((a, b) => {
+                const dataA = new Date(a.split('/').reverse().join('-'));
+                const dataB = new Date(b.split('/').reverse().join('-'));
+                return dataB - dataA;
             });
 
             // Para cada data, criar um bloco de dicas
-            sortedDates.forEach(date => {
-                const dateHeader = document.createElement('h3');
-                dateHeader.innerText = date;
-                dateHeader.style.marginTop = '20px';
-                dateHeader.style.marginBottom = '10px';
-                tipsContainer.appendChild(dateHeader);
+            datasOrdenadas.forEach(data => {
+                const cabecalhoData = document.createElement('h3');
+                cabecalhoData.innerText = data;
+                cabecalhoData.style.marginTop = '20px';
+                cabecalhoData.style.marginBottom = '10px';
+                containerDicas.appendChild(cabecalhoData);
 
-                tipsByDate[date].forEach(tip => {
+                dicasPorData[data].forEach(dica => {
+                    const dicaId = dica['ID'];
+                    const resultado = dica['Resultado'] ? dica['Resultado'].toLowerCase().trim() : '';
                     const card = document.createElement('div');
-                    card.classList.add('analysis-card');
-                    card.innerHTML = `
-                        <h2>${tip['Título da Dica']}</h2>
-                        <p>${tip['Conteúdo da Dica']}</p>
-                        <p><strong>Valor Apostado:</strong> R$ ${formatCurrency(tip['Valor Apostado'])}</p>
-                        <p><strong>Retorno do Valor:</strong> R$ ${formatCurrency(tip['Retorno do Valor'])}</p>
-                        <div class="card-footer">
-                            <span><strong>Tipster:</strong> ${tip['Autor']}</span>
-                            <span><strong>Publicado em:</strong> ${date}</span>
-                        </div>
-                        <div class="card-actions">
-                            <button onclick="likeTip('${tip['ID']}')" id="like-btn-${tip['ID']}">
-                                <i class="fas fa-heart"></i> Curtir (<span id="likes-${tip['ID']}">0</span>)
-                            </button>
-                            <button onclick="toggleComments('${tip['ID']}')">
-                                <i class="fas fa-comment"></i> Comentar
-                            </button>
-                        </div>
-                        <div class="comments-section" id="comments-${tip['ID']}" style="display: none;">
-                            <div class="comments-list" id="comments-list-${tip['ID']}"></div>
-                            <input type="text" id="comment-input-${tip['ID']}" placeholder="Escreva um comentário..." />
-                            <button onclick="addComment('${tip['ID']}')">Enviar</button>
-                        </div>
-                    `;
-                    tipsContainer.appendChild(card);
-                });
-            });
 
-            loadInitialLikes();
-            loadInitialComments();
-        };
-
-        // Formatar data "DD/MM/AAAA" mantendo o formato
-        const formatDate = (dateString) => {
-            const parts = dateString.split('/');
-            if (parts.length !== 3) return dateString;
-            const [day, month, year] = parts;
-            return `${day}/${month}/${year}`;
-        };
-
-        // Converter data "DD/MM/AAAA" em objeto Date
-        const parseDate = (dateString) => {
-            const parts = dateString.split('/');
-            if (parts.length !== 3) return new Date();
-            const [day, month, year] = parts;
-            return new Date(`${year}-${month}-${day}`);
-        };
-
-        // Formatar valores monetários
-        const formatCurrency = (value) => {
-            const number = parseFloat(value);
-            if (isNaN(number)) return '0,00';
-            return number.toFixed(2).replace('.', ',');
-        };
-
-        // ------------------- FUNÇÕES DE CURTIR -------------------
-        window.likeTip = async (tipId) => {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Por favor, faça login para curtir dicas.");
-                console.log('Usuário não está autenticado.');
-                return;
-            }
-
-            const userId = user.uid;
-            console.log(`Usuário ID: ${userId} está curtindo a dica ID: ${tipId}`);
-            const likeId = `${tipId}_${userId}`;
-
-            // Validação dos IDs
-            if (!isValidId(tipId) || !isValidId(userId)) {
-                console.error('ID inválido para curtida');
-                alert("Erro: IDs inválidos.");
-                return;
-            }
-
-            const likeDocRef = doc(db, 'users', userId, 'likes', likeId);
-
-            try {
-                const likeDoc = await getDoc(likeDocRef);
-                console.log(`Documento de curtida existe? ${likeDoc.exists()}`);
-
-                if (likeDoc.exists()) {
-                    // Já curtiu => remover a curtida
-                    await deleteDoc(likeDocRef);
-                    updateLikesDisplay(tipId, -1);
-                    document.getElementById(`like-btn-${tipId}`).classList.remove('button-liked');
-                    console.log(`Curtida removida para a dica ID: ${tipId}`);
-                } else {
-                    // Ainda não curtiu => adicionar a curtida
-                    await setDoc(likeDocRef, {
-                        tipId: tipId,
-                        userId: userId,
-                        timestamp: serverTimestamp()
-                    });
-                    updateLikesDisplay(tipId, 1);
-                    document.getElementById(`like-btn-${tipId}`).classList.add('button-liked');
-                    console.log(`Curtida adicionada para a dica ID: ${tipId}`);
-                }
-            } catch (error) {
-                console.error('Erro ao gerenciar curtida:', error);
-                alert("Ocorreu um erro ao processar sua curtida. Por favor, tente novamente.");
-            }
-        };
-
-        const updateLikesDisplay = (tipId, change) => {
-            const likesSpan = document.getElementById(`likes-${tipId}`);
-            if (!likesSpan) return;
-            let currentLikes = parseInt(likesSpan.innerText);
-            if (isNaN(currentLikes)) currentLikes = 0;
-            currentLikes += change;
-            likesSpan.innerText = currentLikes;
-        };
-
-        const loadInitialLikes = async () => {
-            const user = auth.currentUser;
-            if (!user) return;
-            const userId = user.uid;
-
-            for (const tip of allTips) {
-                try {
-                    const tipId = tip['ID'];
-                    const likeDocRef = doc(db, 'users', userId, 'likes', `${tipId}_${userId}`);
-                    const likeDoc = await getDoc(likeDocRef);
-
-                    // Atualizar o botão de curtida se já estiver curtido
-                    if (likeDoc.exists()) {
-                        document.getElementById(`like-btn-${tipId}`).classList.add('button-liked');
-                    }
-
-                    // Contar o número de curtidas para cada tip
-                    const likesQueryObj = query(collection(db, 'users', userId, 'likes'), where('tipId', '==', tipId));
-                    const likesSnapshot = await getDocs(likesQueryObj);
-                    const likesSpan = document.getElementById(`likes-${tipId}`);
-                    if (likesSpan) {
-                        likesSpan.innerText = likesSnapshot.size;
-                    }
-
-                } catch (error) {
-                    console.error('Erro ao carregar curtidas:', error);
-                }
-            }
-        };
-
-        // Validação de IDs (letras, números, underscores e hifens)
-        const isValidId = (id) => /^[a-zA-Z0-9_-]+$/.test(id);
-
-        // ------------------- FUNÇÕES DE COMENTÁRIOS -------------------
-        window.toggleComments = (tipId) => {
-            const commentsSection = document.getElementById(`comments-${tipId}`);
-            if (commentsSection.style.display === 'none') {
-                commentsSection.style.display = 'block';
-                loadComments(tipId);
-            } else {
-                commentsSection.style.display = 'none';
-            }
-        };
-
-        window.addComment = async (tipId) => {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Por favor, faça login para comentar.");
-                console.log('Usuário não está autenticado.');
-                return;
-            }
-
-            const commentInput = document.getElementById(`comment-input-${tipId}`);
-            const commentText = commentInput.value.trim();
-            if (commentText === '') {
-                alert("O comentário não pode estar vazio.");
-                console.log('Comentário vazio.');
-                return;
-            }
-
-            const userId = user.uid;
-            const username = user.displayName || 'Anônimo';
-            console.log(`Usuário ID: ${userId} está comentando na dica ID: ${tipId}`);
-            console.log(`Texto do comentário: ${commentText}`);
-
-            try {
-                const commentsCollectionRef = collection(db, 'users', userId, 'comments');
-                await setDoc(doc(commentsCollectionRef), {
-                    tipId: tipId,
-                    userId: userId,
-                    username: username,
-                    comment: commentText,
-                    timestamp: serverTimestamp()
-                });
-                commentInput.value = '';
-                console.log(`Comentário adicionado para a dica ID: ${tipId}`);
-            } catch (error) {
-                console.error('Erro ao adicionar comentário:', error);
-                alert("Ocorreu um erro ao enviar seu comentário. Por favor, tente novamente.");
-            }
-        };
-
-        // Função que carrega (e exibe) os comentários para uma dica específica
-        const loadComments = (tipId) => {
-            const commentsList = document.getElementById(`comments-list-${tipId}`);
-            if (!commentsList) return;
-            commentsList.innerHTML = ''; 
-
-            const user = auth.currentUser;
-            if (!user) return;
-
-            // Filtra apenas os comentários com tipId correspondente e ordena por timestamp descendente
-            const commentsQueryObj = query(
-                collection(db, 'users', user.uid, 'comments'),
-                where('tipId', '==', tipId),
-                orderBy('timestamp', 'desc')
-            );
-
-            onSnapshot(commentsQueryObj, (snapshot) => {
-                commentsList.innerHTML = '';
-                snapshot.forEach((docSnap) => {
-                    const comment = docSnap.data();
-                    const commentDiv = document.createElement('div');
-                    commentDiv.classList.add('comment');
-
-                    // Se o comentário pertence ao usuário atual, exibir botão de excluir
-                    let ownerActions = '';
-                    const currentUser = auth.currentUser;
-                    if (currentUser && comment.userId === currentUser.uid) {
-                        ownerActions = `
-                            <button onclick="deleteComment('${docSnap.id}', '${tipId}')">Excluir</button>
+                    // Adicionar classe de acordo com o resultado
+                    if (resultado === 'ganhou') {
+                        card.classList.add('analysis-card', 'resultado-ganhou');
+                        card.innerHTML = `
+                            <h2>${dica['Título da Dica']}</h2>
+                            <p>${dica['Conteúdo da Dica']}</p>
+                            <p><strong>Odd:</strong> ${formatarOdd(dica['Odd'])}</p>
+                            <p><strong>Resultado:</strong> ${dica['Resultado']}</p>
+                            <div class="card-footer">
+                                <span><strong>Tipster:</strong> ${dica['Autor']}</span>
+                                <span><strong>Publicado em:</strong> ${data}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button onclick="selecionarDica('${dicaId}')" id="botao-selecionar-${dicaId}">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        `;
+                    } else if (resultado === 'perdeu') {
+                        card.classList.add('analysis-card', 'resultado-perdeu');
+                        card.innerHTML = `
+                            <h2>${dica['Título da Dica']}</h2>
+                            <p>${dica['Conteúdo da Dica']}</p>
+                            <p><strong>Odd:</strong> ${formatarOdd(dica['Odd'])}</p>
+                            <p><strong>Resultado:</strong> ${dica['Resultado']}</p>
+                            <div class="card-footer">
+                                <span><strong>Tipster:</strong> ${dica['Autor']}</span>
+                                <span><strong>Publicado em:</strong> ${data}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button onclick="selecionarDica('${dicaId}')" id="botao-selecionar-${dicaId}">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        // Caso não haja informação sobre o resultado
+                        card.classList.add('analysis-card');
+                        card.innerHTML = `
+                            <h2>${dica['Título da Dica']}</h2>
+                            <p>${dica['Conteúdo da Dica']}</p>
+                            <p><strong>Odd:</strong> ${formatarOdd(dica['Odd'])}</p>
+                            <p><strong>Resultado:</strong> ${dica['Resultado'] || 'Indefinido'}</p>
+                            <div class="card-footer">
+                                <span><strong>Tipster:</strong> ${dica['Autor']}</span>
+                                <span><strong>Publicado em:</strong> ${data}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button onclick="selecionarDica('${dicaId}')" id="botao-selecionar-${dicaId}">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
                         `;
                     }
 
-                    commentDiv.innerHTML = `
-                        <strong>${comment.username}:</strong> ${comment.comment}
-                        ${ownerActions}
-                    `;
-                    commentsList.appendChild(commentDiv);
+                    containerDicas.appendChild(card);
                 });
-            }, (error) => {
-                console.error('Erro ao carregar comentários:', error);
             });
-        };
 
-        // Ao inicializar, carregamos comentários de todas as dicas
-        const loadInitialComments = () => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            for (const tip of allTips) {
-                loadComments(tip['ID']);
+            if (auth.currentUser) {
+                carregarSelecoesIniciais();
             }
         };
 
-        // Função para excluir um comentário (se for autor)
-        window.deleteComment = async (commentDocId, tipId) => {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Por favor, faça login para excluir comentários.");
-                console.log('Usuário não está autenticado.');
+        // Formatar data "DD/MM/AAAA" mantendo o formato
+        const formatarData = (dataString) => {
+            const partes = dataString.split('/');
+            if (partes.length !== 3) return dataString;
+            const [dia, mes, ano] = partes;
+            return `${dia}/${mes}/${ano}`;
+        };
+
+        // Converter data "DD/MM/AAAA" em objeto Date
+        const parsearData = (dataString) => {
+            const partes = dataString.split('/');
+            if (partes.length !== 3) return new Date();
+            const [dia, mes, ano] = partes;
+            return new Date(`${ano}-${mes}-${dia}`);
+        };
+
+        // Formatar valores de Odd
+        const formatarOdd = (odd) => {
+            const numero = parseFloat(odd);
+            if (isNaN(numero)) return '0.00';
+            return numero.toFixed(2);
+        };
+
+        // ------------------- FUNÇÕES DE SELEÇÃO DE DICAS -------------------
+        window.selecionarDica = async (dicaId) => {
+            const usuario = auth.currentUser;
+            if (!usuario) {
+                alert("Por favor, faça login para selecionar dicas.");
                 return;
             }
 
+            const usuarioId = usuario.uid;
+            const referenciaSelecao = doc(db, 'users', usuarioId, 'selecoes', dicaId);
+
             try {
-                await deleteDoc(doc(db, 'users', user.uid, 'comments', commentDocId));
-                console.log(`Comentário ${commentDocId} excluído.`);
-                // O onSnapshot() já irá atualizar a lista em tempo real, 
-                // então não precisamos manualmente remover o comentário da UI
-            } catch (error) {
-                console.error('Erro ao excluir comentário:', error);
-                alert("Ocorreu um erro ao excluir seu comentário. Por favor, tente novamente.");
+                const documentoSelecao = await getDoc(referenciaSelecao);
+                if (documentoSelecao.exists()) {
+                    // Já selecionado => remover seleção
+                    await deleteDoc(referenciaSelecao);
+                    const botao = document.getElementById(`botao-selecionar-${dicaId}`);
+                    if (botao) {
+                        botao.classList.remove('button-favorited');
+                        botao.innerHTML = `<i class="fas fa-plus"></i> Adicionar`;
+                    }
+                } else {
+                    // Ainda não selecionado => adicionar seleção
+                    await setDoc(referenciaSelecao, {
+                        dicaId: dicaId,
+                        selecionadoEm: serverTimestamp()
+                    });
+                    const botao = document.getElementById(`botao-selecionar-${dicaId}`);
+                    if (botao) {
+                        botao.classList.add('button-favorited');
+                        botao.innerHTML = `<i class="fas fa-check"></i> Selecionado`;
+                    }
+                }
+            } catch (erro) {
+                console.error('Erro ao gerenciar seleção:', erro);
+                alert("Ocorreu um erro ao processar sua seleção. Por favor, tente novamente.");
+            }
+        };
+
+        const carregarSelecoesIniciais = async () => {
+            const usuario = auth.currentUser;
+            if (!usuario) return;
+            const usuarioId = usuario.uid;
+
+            try {
+                const referenciaColecaoSelecoes = collection(db, 'users', usuarioId, 'selecoes');
+                const snapshotSelecoes = await getDocs(referenciaColecaoSelecoes);
+
+                snapshotSelecoes.forEach((documentoSelecao) => {
+                    const dicaId = documentoSelecao.id;
+                    const botaoSelecionar = document.getElementById(`botao-selecionar-${dicaId}`);
+                    if (botaoSelecionar) {
+                        botaoSelecionar.classList.add('button-favorited');
+                        botaoSelecionar.innerHTML = `<i class="fas fa-check"></i> Selecionado`;
+                    }
+                });
+            } catch (erro) {
+                console.error('Erro ao carregar seleções:', erro);
             }
         };
 
         // ------------------- AUTENTICAÇÃO -------------------
         // Atualizar UI com base no estado de autenticação
-        const updateAuthUI = (user) => {
-            const logoutBtns = document.querySelectorAll('#logout-btn');
-            logoutBtns.forEach(btn => {
-                if (user) {
-                    btn.textContent = "Sair";
-                    btn.href = "#";
-                    btn.onclick = async (e) => {
-                        e.preventDefault();
-                        await logout();
+        const atualizarUIAutenticacao = (usuario) => {
+            const botoesLogout = document.querySelectorAll('.logout-btn');
+            botoesLogout.forEach(botao => {
+                if (usuario) {
+                    botao.textContent = "Sair";
+                    botao.href = "#";
+                    botao.onclick = async (evento) => {
+                        evento.preventDefault();
+                        await fazerLogout();
                     };
                 } else {
-                    btn.textContent = "Login";
-                    btn.href = "login.html"; // Redirecionar para a página de login
+                    botao.textContent = "Login";
+                    botao.href = "index.html"; // Redirecionar para a página de login
                 }
             });
         };
 
-        const logout = async () => {
+        // Função para efetuar logout
+        const fazerLogout = async () => {
             try {
                 await signOut(auth);
                 alert("Logout realizado com sucesso!");
-            } catch (error) {
-                console.error('Erro ao fazer logout:', error);
+            } catch (erro) {
+                console.error('Erro ao fazer logout:', erro);
                 alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
             }
         };
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log(`Usuário autenticado: ${user.uid}`);
-                await initializeFirestoreStructure(user);
+        // Listener para mudanças no estado de autenticação
+        onAuthStateChanged(auth, async (usuario) => {
+            if (usuario) {
+                console.log(`Usuário autenticado: ${usuario.uid}`);
+                await inicializarEstruturaFirestore(usuario);
+                // Agora que o usuário está autenticado, buscar as dicas
+                await buscarDicasDaPlanilha();
+                // Re-renderizar as dicas para atualizar o estado das seleções
+                renderizarDicas(todasAsDicas);
             } else {
                 console.log('Nenhum usuário autenticado');
+                document.getElementById('tips-container').innerHTML = '<p>Por favor, faça login para ver as dicas.</p>';
             }
-            updateAuthUI(user);
+            atualizarUIAutenticacao(usuario);
         });
 
         // ------------------- INICIALIZAÇÃO -------------------
-        const init = () => {
-            fetchTipsFromSheet();
-            document.getElementById('apply-filters').addEventListener('click', (e) => {
-                e.preventDefault();
-                applyFilters();
+        const inicializar = () => {
+            document.getElementById('apply-filters').addEventListener('click', (evento) => {
+                evento.preventDefault();
+                aplicarFiltros();
             });
-            document.getElementById('clear-filters').addEventListener('click', (e) => {
-                e.preventDefault();
-                clearFilters();
+            document.getElementById('clear-filters').addEventListener('click', (evento) => {
+                evento.preventDefault();
+                limparFiltros();
             });
 
             // Sidebar toggle para mobile
-            const menuBtn = document.getElementById('menu-btn');
-            const closeBtn = document.getElementById('close-btn');
+            const botaoMenu = document.getElementById('menu-btn');
+            const botaoFechar = document.getElementById('close-btn');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
 
-            // Remover o botão de menu, pois solicitado
-            if (menuBtn) {
-                menuBtn.style.display = 'none';
+            if (botaoMenu) {
+                botaoMenu.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                });
             }
 
-            if (closeBtn) {
-                closeBtn.style.display = 'none';
+            if (botaoFechar) {
+                botaoFechar.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
             }
 
-            // Se desejar manter a funcionalidade de sidebar sem o botão de menu,
-            // você pode optar por remover esses elementos do HTML ou mantê-los escondidos
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
         };
 
-        window.onload = init;
+        window.onload = inicializar;
     </script>
 </head>
 <body>
@@ -1051,56 +956,44 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h1 class="logo">Super Tip</h1>
-            <button class="close-btn" id="close-btn" style="display: none;">
+            <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <nav class="sidebar-nav">
             <ul>
                 <li>
-                    <a href="index2.html">
+                    <a href="index2.html" aria-label="Home">
                         <i class="fas fa-home"></i>
                         Home
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <i class="fas fa-chart-line"></i>
-                        Minhas Análises
-                    </a>
-                </li>
-                <li>
-                    <a href="analise.html">
+                    <a href="analise.html" aria-label="Análises">
                         <i class="fas fa-chart-bar"></i>
                         Análises
                     </a>
                 </li>
                 <li>
-                    <a href="jogos.html">
+                    <a href="jogos.html" aria-label="Explorar">
                         <i class="fas fa-compass"></i>
                         Explorar
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <i class="fas fa-bell"></i>
-                        Notificações
+                    <a href="selecao.html" aria-label="Minhas Seleções">
+                        <i class="fas fa-list"></i>
+                        Minhas Seleções
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="perfil.html" aria-label="Perfil">
                         <i class="fas fa-user"></i>
                         Perfil
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <i class="fas fa-cog"></i>
-                        Configurações
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="logout-btn">
+                    <a href="#" class="logout-btn" aria-label="Sair">
                         <i class="fas fa-sign-out-alt"></i>
                         Sair
                     </a>
@@ -1122,7 +1015,7 @@
             </button> -->
             <!-- Logo no Cabeçalho (imagem removida) -->
             <div class="header-logo">
-                <a href="index2.html">
+                <a href="index2.html" aria-label="ApostaPro Home">
                     <!-- <img src="assets/logo.png" alt="ApostaPro Logo" class="logo-image"> -->
                     <span class="logo-text">ApostaPro</span>
                 </a>
@@ -1130,24 +1023,24 @@
             <!-- Barra de Busca -->
             <div class="search-bar">
                 <input type="text" id="search-input" placeholder="Buscar análises ou tipsters..." aria-label="Buscar">
-                <button id="search-btn">
+                <button id="search-btn" aria-label="Buscar">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
             <!-- Ícones de Notificação e Perfil -->
             <div class="header-icons">
-                <a href="#" class="notification-icon">
+                <a href="#" class="notification-icon" aria-label="Notificações">
                     <i class="fas fa-bell"></i>
                     <span class="icon-badge" id="notification-badge">3</span>
                 </a>
                 <div class="profile-dropdown">
-                    <a href="#">
+                    <a href="#" aria-label="Perfil">
                         <i class="fas fa-user-circle"></i>
                     </a>
                     <div class="dropdown-content">
                         <a href="#">Meu Perfil</a>
                         <a href="#">Configurações</a>
-                        <a href="#" id="logout-btn">Sair</a>
+                        <a href="#" class="logout-btn">Sair</a>
                     </div>
                 </div>
             </div>
