@@ -138,7 +138,7 @@
             overflow-y: auto;
         }
 
-        /* Cabeçalho */
+        /* Header */
         .header {
             height: 70px; /* Aumento da altura para acomodar novos elementos */
             background-color: var(--color-white);
@@ -431,6 +431,7 @@
 
         /* Responsividade */
         @media (max-width: 768px) {
+            /* Exibir a sidebar somente quando ativa */
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -443,13 +444,29 @@
                 display: block;
             }
 
+            /* Exibir o botão de fechar na sidebar */
             .close-btn {
                 display: block;
             }
 
-            /* Remover o botão de menu no cabeçalho */
+            /* Exibir o botão de menu no cabeçalho */
             .menu-btn {
-                display: none;
+                display: block;
+                background: none;
+                border: none;
+                color: var(--color-primary);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            /* Ocultar o menu na versão mobile */
+            .sidebar-nav {
+                padding-top: 60px; /* Espaço para o botão de fechar */
+            }
+
+            /* Remover o botão de menu no cabeçalho para desktop */
+            .menu-btn {
+                display: block;
             }
 
             .main-content {
@@ -472,6 +489,9 @@
             /* Ajustes no cabeçalho para dispositivos móveis */
             .search-bar {
                 display: flex; /* Manter a barra de busca visível */
+                flex: 1;
+                max-width: none;
+                margin: 0 10px;
             }
 
             /* Aumento do espaçamento entre o cabeçalho e as dicas */
@@ -480,8 +500,13 @@
             }
         }
 
-        /* Aumento do espaçamento entre o cabeçalho e as dicas para telas maiores */
+        /* Ocultar o botão de menu no desktop */
         @media (min-width: 769px) {
+            .menu-btn {
+                display: none;
+            }
+
+            /* Aumento do espaçamento entre o cabeçalho e as dicas para telas maiores */
             .feed {
                 margin-top: 30px; /* Ajuste conforme necessário */
             }
@@ -1009,10 +1034,10 @@
     <div class="main-content">
         <!-- Header -->
         <header class="header">
-            <!-- Remover o botão de menu no cabeçalho -->
-            <!-- <button class="menu-btn" id="menu-btn">
+            <!-- Botão de menu para mobile -->
+            <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
                 <i class="fas fa-bars"></i>
-            </button> -->
+            </button>
             <!-- Logo no Cabeçalho (imagem removida) -->
             <div class="header-logo">
                 <a href="index2.html" aria-label="ApostaPro Home">
