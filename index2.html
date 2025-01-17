@@ -21,26 +21,30 @@
 
         /* Variáveis de cores para facilitar a manutenção e consistência */
         :root {
-            --color-primary: #1e3a8a; /* Azul escuro */
-            --color-secondary: #3b82f6; /* Azul médio */
-            --color-accent: #10b981; /* Verde */
-            --color-bg: #f3f4f6; /* Cinza claro */
-            --color-text: #1f2937; /* Cinza escuro */
-            --color-white: #ffffff;
-            --color-filter-bg: #ffffff;
-            --color-filter-border: #d1d5db;
-            --color-button-bg: #3b82f6;
-            --color-button-hover: #1e40af;
-            --color-button-text: #ffffff;
-            --color-button-secondary-bg: #e5e7eb;
-            --color-button-secondary-text: #374151;
-            --color-card-border: #d1d5db;
-            --color-card-hover: #e5e7eb;
-            --color-table-header: #3b82f6;
-            --color-table-text: #1f2937;
-            --color-table-border: #d1d5db;
-            --color-success-border: #10b981; /* Verde para acerto */
-            --color-error-border: #ef4444; /* Vermelho para erro */
+            --cor-primaria: #1e3a8a; /* Azul escuro */
+            --cor-secundaria: #3b82f6; /* Azul médio */
+            --cor-accent: #10b981; /* Verde */
+            --cor-fundo: #f3f4f6; /* Cinza claro */
+            --cor-texto: #1f2937; /* Cinza escuro */
+            --cor-branca: #ffffff;
+            --cor-filtro-fundo: #ffffff;
+            --cor-filtro-borda: #d1d5db;
+            --cor-botao-fundo: #3b82f6;
+            --cor-botao-hover: #1e40af;
+            --cor-botao-texto: #ffffff;
+            --cor-botao-secundario-fundo: #e5e7eb;
+            --cor-botao-secundario-texto: #374151;
+            --cor-cartao-borda: #d1d5db;
+            --cor-cartao-hover: #e5e7eb;
+            --cor-tabela-cabecalho: #3b82f6;
+            --cor-tabela-texto: #1f2937;
+            --cor-tabela-borda: #d1d5db;
+            --cor-cabecalho-fundo: var(--cor-branca);
+            --cor-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+            --cor-sidebar-fundo: var(--cor-primaria);
+            --cor-sidebar-ativa: var(--cor-secundaria);
+            --cor-sucesso-borda: #10b981; /* Verde para acerto */
+            --cor-erro-borda: #ef4444; /* Vermelho para erro */
         }
 
         /* Estilos para a Sidebar */
@@ -48,10 +52,10 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 200px; /* Redução da largura da sidebar */
+            width: 220px; /* Largura da sidebar */
             height: 100%;
-            background-color: var(--color-primary);
-            color: var(--color-white);
+            background-color: var(--cor-sidebar-fundo);
+            color: var(--cor-branca);
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease-in-out;
@@ -63,7 +67,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background-color: var(--color-secondary);
+            background-color: var(--cor-sidebar-ativa);
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         .logo {
@@ -77,7 +82,7 @@
         .close-btn {
             background: none;
             border: none;
-            color: var(--color-white);
+            color: var(--cor-branca);
             font-size: 1.2rem;
             cursor: pointer;
             display: none; /* Esconder em desktop */
@@ -100,14 +105,18 @@
             display: flex;
             align-items: center;
             padding: 12px 20px;
-            color: var(--color-white);
+            color: var(--cor-branca);
             text-decoration: none;
-            transition: background 0.2s;
+            transition: background 0.2s, border 0.2s;
             border-radius: 4px;
+            font-size: 1rem;
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            flex-shrink: 0;
         }
 
         .sidebar-nav a:hover {
-            background-color: var(--color-secondary);
+            background-color: var(--cor-sidebar-ativa);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
         .sidebar-nav i {
@@ -128,46 +137,66 @@
 
         /* Main Content */
         .main-content {
-            margin-left: 200px; /* Ajustar conforme a nova largura da sidebar */
+            margin-left: 220px; /* Ajustar conforme a largura da sidebar */
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: var(--color-bg);
+            background-color: var(--cor-fundo);
             transition: margin-left 0.3s ease-in-out;
             padding: 20px; /* Adicionar padding para não ficar grudado nas bordas */
             overflow-y: auto;
         }
 
-        /* Header */
+        /* Cabeçalho */
         .header {
             height: 70px; /* Aumento da altura para acomodar novos elementos */
-            background-color: var(--color-white);
+            background-color: var(--cor-cabecalho-fundo);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0 30px;
+            box-shadow: 0 2px 4px var(--cor-cabecalho-sombra);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+            flex-shrink: 0; /* Evitar encolhimento */
+            flex-wrap: wrap; /* Permitir que os elementos envolvam */
+            position: relative; /* Para posicionamento absoluto do menu button */
+        }
+
+        /* Botão de Menu para Mobile */
+        .menu-btn {
+            display: none; /* Esconder em desktop */
+            background: none;
+            border: none;
+            color: var(--cor-texto);
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute; /* Posicionar absoluto */
+            left: 20px; /* Alinhar à esquerda */
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         /* Logo no Cabeçalho */
         .header-logo {
             display: flex;
             align-items: center;
+            flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+            justify-content: flex-start; /* Alinhar à esquerda no desktop */
         }
 
         .header-logo a {
             display: flex;
             align-items: center;
             text-decoration: none;
-            color: var(--color-primary);
+            color: var(--cor-primaria);
         }
 
         .logo-text {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
         }
 
@@ -175,98 +204,42 @@
         .search-bar {
             display: flex;
             align-items: center;
-            flex: 1;
-            max-width: 400px;
-            margin: 0 20px;
+            flex: 2 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            max-width: 400px; /* Aumentar para mais espaço */
+            margin: 0 30px;
+            width: 100%; /* Garantir que ocupe a largura disponível */
         }
 
         .search-bar input {
             width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--color-filter-border);
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid var(--cor-filtro-borda);
+            border-right: none;
             border-radius: 4px 0 0 4px;
             outline: none;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            color: var(--cor-texto);
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button {
-            padding: 8px 12px;
-            border: none;
-            background-color: var(--color-button-bg);
-            color: var(--color-button-text);
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
             border-radius: 0 4px 4px 0;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s, border 0.3s;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button:hover {
-            background-color: var(--color-button-hover);
+            background-color: var(--cor-botao-hover);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
-        /* Ícones de Notificação e Perfil */
-        .header-icons {
-            display: flex;
-            align-items: center;
-        }
-
-        .notification-icon {
-            position: relative;
-            margin-right: 20px;
-            color: var(--color-text);
-            font-size: 1.2rem;
-            text-decoration: none;
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: var(--color-accent);
-            color: var(--color-white);
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7rem;
-        }
-
-        /* Dropdown do Perfil */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown a {
-            color: var(--color-text);
-            font-size: 1.5rem;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--color-white);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 4px;
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: var(--color-text);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.2s;
-        }
-
-        .dropdown-content a:hover {
-            background-color: var(--color-filter-bg);
-        }
-
-        .profile-dropdown:hover .dropdown-content {
-            display: block;
-        }
+        /* Removido: Ícones de Notificação e Perfil */
 
         /* Filtros */
         .filters {
@@ -275,9 +248,9 @@
             gap: 15px;
             margin-bottom: 20px;
             align-items: center;
-            background-color: var(--color-filter-bg);
+            background-color: var(--cor-filtro-fundo);
             padding: 15px;
-            border: 1px solid var(--color-filter-border);
+            border: 1px solid var(--cor-filtro-borda);
             border-radius: 8px;
         }
 
@@ -289,12 +262,12 @@
         .filter-group label {
             margin-bottom: 5px;
             font-weight: bold;
-            color: var(--color-text);
+            color: var(--cor-texto);
         }
 
         .filter-select, .filter-date {
             padding: 8px 12px;
-            border: 1px solid var(--color-filter-border);
+            border: 1px solid var(--cor-filtro-borda);
             border-radius: 4px;
             outline: none;
             width: 200px;
@@ -302,29 +275,29 @@
         }
 
         .filter-select:focus, .filter-date:focus {
-            border-color: var(--color-secondary);
+            border-color: var(--cor-secundaria);
         }
 
         .filter-button {
             padding: 10px 20px;
-            background-color: var(--color-button-bg);
-            color: var(--color-button-text);
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
             border: none;
             border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s;
         }
 
         .filter-button:hover {
-            background-color: var(--color-button-hover);
+            background-color: var(--cor-botao-hover);
         }
 
         #clear-filters {
-            background-color: var(--color-button-secondary-bg);
-            color: var(--color-button-secondary-text);
+            background-color: var(--cor-botao-secundario-fundo);
+            color: var(--cor-botao-secundario-texto);
         }
 
         #clear-filters:hover {
@@ -333,14 +306,13 @@
 
         /* Cards */
         .analysis-card {
-            background-color: var(--color-white);
+            background-color: var(--cor-branca);
             padding: 20px;
             border-radius: 12px; /* Aumento do border-radius */
-            border: 2px solid var(--color-card-border);
+            border: 1px solid var(--cor-cartao-borda); /* Reduzido de 2px para 1px */
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Melhoria na sombra */
             margin-bottom: 20px;
             transition: transform 0.2s, box-shadow 0.2s;
-            /* Adicionar margem interna para não ficar grudado nas bordas */
         }
 
         .analysis-card:hover {
@@ -350,17 +322,19 @@
 
         /* Classes para indicar resultado */
         .analysis-card.resultado-ganhou {
-            border-color: var(--color-success-border);
+            border-color: var(--cor-sucesso-borda);
+            background-color: rgba(16, 185, 129, 0.05); /* Verde claro */
         }
 
         .analysis-card.resultado-perdeu {
-            border-color: var(--color-error-border);
+            border-color: var(--cor-erro-borda);
+            background-color: rgba(239, 68, 68, 0.05); /* Vermelho claro */
         }
 
         .analysis-card h2 {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.6rem;
-            color: var(--color-text);
+            color: var(--cor-texto);
             margin-bottom: 10px;
         }
 
@@ -378,7 +352,7 @@
             margin-top: 15px;
         }
 
-        /* Botões Selecionar */
+        /* Botões Remover */
         .card-actions {
             display: flex;
             gap: 10px;
@@ -387,53 +361,66 @@
 
         .card-actions button {
             background: none;
-            border: none;
-            color: var(--color-primary);
+            border: 1px solid var(--cor-primaria); /* Adicionado borda para consistência */
+            color: var(--cor-primaria);
             cursor: pointer;
             display: flex;
             align-items: center;
             font-size: 0.9rem;
-            transition: color 0.2s, background-color 0.2s;
-            padding: 8px 12px;
+            transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+            padding: 5px 10px; /* Ajustado para harmonizar com a barra de busca */
             border-radius: 4px;
         }
 
         .card-actions button:hover {
-            color: var(--color-secondary);
-            background-color: var(--color-card-hover);
+            color: var(--cor-secundaria);
+            background-color: var(--cor-cartao-hover);
+            border-color: var(--cor-secundaria); /* Mudança da cor da borda no hover */
         }
 
         .card-actions button i {
             margin-right: 5px;
         }
 
-        /* Botão Selecionar Ativo */
-        .button-favorited {
-            background-color: var(--color-accent);
-            color: var(--color-white);
-        }
-
-        .button-favorited:hover {
-            background-color: var(--color-accent);
-        }
-
         /* Footer */
         .footer {
             height: 40px; /* Redução da altura do rodapé */
-            background-color: var(--color-primary);
-            color: var(--color-white);
+            background-color: var(--cor-primaria);
+            color: var(--cor-branca);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
             margin-top: auto;
+            border-top: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         /* Responsividade */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .header {
+                padding: 0 20px;
+                height: 100px; /* Manter altura fixa */
+                flex-wrap: wrap; /* Permitir quebra de linha */
+            }
+
+            .search-bar {
+                margin: 10px 0; /* Adicionado margem vertical */
+                max-width: 250px; /* Ajuste para telas menores */
+            }
+        }
+
         @media (max-width: 768px) {
-            /* Exibir a sidebar somente quando ativa */
             .sidebar {
                 transform: translateX(-100%);
+                width: 220px;
             }
 
             .sidebar.active {
@@ -444,28 +431,7 @@
                 display: block;
             }
 
-            /* Exibir o botão de fechar na sidebar */
             .close-btn {
-                display: block;
-            }
-
-            /* Exibir o botão de menu no cabeçalho */
-            .menu-btn {
-                display: block;
-                background: none;
-                border: none;
-                color: var(--color-primary);
-                font-size: 1.5rem;
-                cursor: pointer;
-            }
-
-            /* Ocultar o menu na versão mobile */
-            .sidebar-nav {
-                padding-top: 60px; /* Espaço para o botão de fechar */
-            }
-
-            /* Remover o botão de menu no cabeçalho para desktop */
-            .menu-btn {
                 display: block;
             }
 
@@ -477,21 +443,48 @@
                 padding: 10px;
             }
 
-            .filters {
+            /* Ocultar a barra de busca */
+            .search-bar {
+                display: none;
+            }
+
+            /* Botão de Menu visível apenas em mobile */
+            .menu-btn {
+                display: block;
+                position: absolute; /* Posicionar absoluto */
+                left: 20px; /* Alinhar à esquerda */
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            /* Centralizar o logo na versão mobile */
+            .header-logo {
+                align-self: center; /* Alinha o logo ao centro */
+                text-align: center; /* Centraliza o texto dentro do container */
+                flex: 1;
+            }
+
+            /* Ajustar layout da barra de busca para mobile */
+            .search-bar {
+                display: none; /* Garantir que a barra de busca esteja oculta */
+            }
+
+            /* Ajustes adicionais para os botões na versão mobile */
+            .card-actions {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
-            .filter-select, .filter-date {
+            .card-actions button {
                 width: 100%;
+                justify-content: flex-start;
             }
 
-            /* Ajustes no cabeçalho para dispositivos móveis */
-            .search-bar {
-                display: flex; /* Manter a barra de busca visível */
-                flex: 1;
-                max-width: none;
-                margin: 0 10px;
+            .header {
+                flex-direction: column;
+                align-items: center; /* Alinhar itens ao centro */
+                height: auto;
+                padding: 10px;
             }
 
             /* Aumento do espaçamento entre o cabeçalho e as dicas */
@@ -500,13 +493,8 @@
             }
         }
 
-        /* Ocultar o botão de menu no desktop */
+        /* Adição de espaçamento entre o cabeçalho e as dicas para telas maiores */
         @media (min-width: 769px) {
-            .menu-btn {
-                display: none;
-            }
-
-            /* Aumento do espaçamento entre o cabeçalho e as dicas para telas maiores */
             .feed {
                 margin-top: 30px; /* Ajuste conforme necessário */
             }
@@ -524,10 +512,6 @@
             getDocs, 
             setDoc, 
             deleteDoc, 
-            query, 
-            where, 
-            onSnapshot, 
-            orderBy, 
             getDoc, 
             serverTimestamp,
             addDoc,
@@ -1038,10 +1022,9 @@
             <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Logo no Cabeçalho (imagem removida) -->
+            <!-- Logo no Cabeçalho -->
             <div class="header-logo">
                 <a href="index2.html" aria-label="ApostaPro Home">
-                    <!-- <img src="assets/logo.png" alt="ApostaPro Logo" class="logo-image"> -->
                     <span class="logo-text">ApostaPro</span>
                 </a>
             </div>
@@ -1052,23 +1035,7 @@
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-            <!-- Ícones de Notificação e Perfil -->
-            <div class="header-icons">
-                <a href="#" class="notification-icon" aria-label="Notificações">
-                    <i class="fas fa-bell"></i>
-                    <span class="icon-badge" id="notification-badge">3</span>
-                </a>
-                <div class="profile-dropdown">
-                    <a href="#" aria-label="Perfil">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <div class="dropdown-content">
-                        <a href="#">Meu Perfil</a>
-                        <a href="#">Configurações</a>
-                        <a href="#" class="logout-btn">Sair</a>
-                    </div>
-                </div>
-            </div>
+            <!-- Ícones de Notificação e Perfil Removidos -->
         </header>
 
         <!-- Feed de Análises -->

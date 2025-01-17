@@ -68,6 +68,7 @@
             align-items: center;
             padding: 20px;
             background-color: var(--cor-sidebar-ativa);
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         .logo {
@@ -106,13 +107,16 @@
             padding: 12px 20px;
             color: var(--cor-branca);
             text-decoration: none;
-            transition: background 0.2s;
+            transition: background 0.2s, border 0.2s;
             border-radius: 4px;
             font-size: 1rem;
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            flex-shrink: 0;
         }
 
         .sidebar-nav a:hover {
             background-color: var(--cor-sidebar-ativa);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
         .sidebar-nav i {
@@ -145,7 +149,7 @@
 
         /* Cabeçalho */
         .header {
-            height: 70px; /* Aumento da altura para acomodar novos elementos */
+            height: 100px; /* Aumento da altura para 100px */
             background-color: var(--cor-cabecalho-fundo);
             display: flex;
             align-items: center;
@@ -155,6 +159,10 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+            flex-shrink: 0; /* Evitar encolhimento */
+            flex-wrap: wrap; /* Permitir que os elementos envolvam */
+            position: relative; /* Para posicionamento absoluto do menu button */
         }
 
         /* Botão de Menu para Mobile */
@@ -165,12 +173,18 @@
             color: var(--cor-texto);
             font-size: 1.5rem;
             cursor: pointer;
+            position: absolute; /* Posicionar absoluto */
+            left: 20px; /* Alinhar à esquerda */
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         /* Logo no Cabeçalho */
         .header-logo {
             display: flex;
             align-items: center;
+            flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+            justify-content: flex-start; /* Alinhar à esquerda no desktop */
         }
 
         .header-logo a {
@@ -190,116 +204,39 @@
         .search-bar {
             display: flex;
             align-items: center;
-            flex: 1;
-            max-width: 500px;
+            flex: 2 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            max-width: 400px; /* Aumentar para mais espaço */
             margin: 0 30px;
+            width: 100%; /* Garantir que ocupe a largura disponível */
         }
 
         .search-bar input {
             width: 100%;
-            padding: 10px 15px;
+            padding: 5px 12px; /* Aumentado para 32px de altura */
             border: 1px solid var(--cor-filtro-borda);
             border-right: none;
             border-radius: 4px 0 0 4px;
             outline: none;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
             color: var(--cor-texto);
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button {
-            padding: 10px 15px;
-            border: none;
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
             background-color: var(--cor-botao-fundo);
             color: var(--cor-botao-texto);
             border-radius: 0 4px 4px 0;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1rem;
+            transition: background-color 0.3s, border 0.3s;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button:hover {
             background-color: var(--cor-botao-hover);
-        }
-
-        /* Ícones de Notificação e Perfil */
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .notification-icon {
-            position: relative;
-            color: var(--cor-texto);
-            font-size: 1.4rem;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .notification-icon:hover {
-            color: var(--cor-secundaria);
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: var(--cor-accent);
-            color: var(--cor-branca);
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7rem;
-        }
-
-        /* Dropdown do Perfil */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown a {
-            color: var(--cor-texto);
-            font-size: 1.8rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .profile-dropdown a:hover {
-            color: var(--cor-secundaria);
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--cor-branca);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 4px;
-            z-index: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .dropdown-content a {
-            color: var(--cor-texto);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-        }
-
-        .dropdown-content a:hover {
-            background-color: var(--cor-filtro-fundo);
-        }
-
-        .profile-dropdown:hover .dropdown-content {
-            display: block;
-            opacity: 1;
-            visibility: visible;
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
         /* Cards */
@@ -307,7 +244,7 @@
             background-color: var(--cor-branca);
             padding: 20px;
             border-radius: 12px; /* Aumento do border-radius */
-            border: 2px solid var(--cor-cartao-borda);
+            border: 1px solid var(--cor-cartao-borda); /* Reduzido de 2px para 1px */
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Melhoria na sombra */
             margin-bottom: 20px;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -359,20 +296,21 @@
 
         .card-actions button {
             background: none;
-            border: none;
+            border: 1px solid var(--cor-primaria); /* Adicionado borda para consistência */
             color: var(--cor-primaria);
             cursor: pointer;
             display: flex;
             align-items: center;
             font-size: 0.9rem;
-            transition: color 0.3s, background-color 0.3s;
-            padding: 8px 12px;
+            transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+            padding: 5px 10px; /* Ajustado para harmonizar com a barra de busca */
             border-radius: 4px;
         }
 
         .card-actions button:hover {
             color: var(--cor-secundaria);
             background-color: var(--cor-cartao-hover);
+            border-color: var(--cor-secundaria); /* Mudança da cor da borda no hover */
         }
 
         .card-actions button i {
@@ -389,6 +327,7 @@
             justify-content: center;
             font-size: 0.9rem;
             margin-top: auto;
+            border-top: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         /* Responsividade */
@@ -403,10 +342,13 @@
 
             .header {
                 padding: 0 20px;
+                height: 100px; /* Manter altura fixa */
+                flex-wrap: wrap; /* Permitir quebra de linha */
             }
 
             .search-bar {
-                margin: 0 20px;
+                margin: 10px 0; /* Adicionado margem vertical */
+                max-width: 250px; /* Ajuste para telas menores */
             }
         }
 
@@ -436,43 +378,29 @@
                 padding: 10px;
             }
 
-            /* Ajustes no cabeçalho para dispositivos móveis */
+            /* Ocultar a barra de busca */
             .search-bar {
-                margin: 0 10px;
-                max-width: 300px;
+                display: none;
             }
 
             /* Botão de Menu visível apenas em mobile */
             .menu-btn {
                 display: block;
+                position: absolute; /* Posicionar absoluto */
+                left: 20px; /* Alinhar à esquerda */
+                top: 50%;
+                transform: translateY(-50%);
             }
 
-            /* Ajustes adicionais para os botões na versão mobile */
-            .card-actions {
-                flex-direction: column;
-                align-items: flex-start;
+            /* Centralizar o logo */
+            .header-logo {
+                justify-content: center; /* Centralizar o logo */
+                flex: 1;
             }
 
-            .card-actions button {
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                height: auto;
-                padding: 10px;
-            }
-
+            /* Ajustar layout da barra de busca para mobile */
             .search-bar {
-                width: 100%;
-                margin: 10px 0;
-            }
-
-            /* Aumento do espaçamento entre o cabeçalho e as dicas */
-            .feed {
-                margin-top: 20px; /* Ajuste conforme necessário */
+                display: none; /* Garantir que a barra de busca esteja oculta */
             }
         }
 
@@ -520,7 +448,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" aria-label="Perfil">
+                    <a href="perfil.html" aria-label="Perfil">
                         <i class="fas fa-user"></i>
                         Perfil
                     </a>
@@ -560,23 +488,7 @@
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-            <!-- Ícones de Notificação e Perfil -->
-            <div class="header-icons">
-                <a href="#" class="notification-icon" aria-label="Notificações">
-                    <i class="fas fa-bell"></i>
-                    <span class="icon-badge" id="notification-badge">3</span>
-                </a>
-                <div class="profile-dropdown">
-                    <a href="#" aria-label="Perfil">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <div class="dropdown-content">
-                        <a href="#">Meu Perfil</a>
-                        <a href="#">Configurações</a>
-                        <a href="#" class="logout-btn">Sair</a>
-                    </div>
-                </div>
-            </div>
+         
         </header>
 
         <!-- Feed de Seleções -->

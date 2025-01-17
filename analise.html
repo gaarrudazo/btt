@@ -11,134 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <!-- Sidebar -->
-     <!-- Sidebar -->
-     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h1 class="logo">Super Tip</h1>
-            <button class="close-btn" id="close-btn" style="display: none;">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li>
-                    <a href="index2.html">
-                        <i class="fas fa-home"></i>
-                        Home
-                    </a>
-                </li>
-                <li>
-                    <a href="analise.html">
-                        <i class="fas fa-chart-bar"></i>
-                        Análises
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="fas fa-compass"></i>
-                        Explorar
-                    </a>
-                </li>
-                <li>
-                    <a href="selecao.html">
-                        <i class="fas fa-list"></i>
-                        Minhas Seleções
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-user"></i>
-                        Perfil
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Sair
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
-
-    <!-- Overlay para mobile -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <button class="menu-btn" id="menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-            <!-- Campo de busca opcional -->
-            <div class="header-icons">
-                <a href="#">
-                    <i class="fas fa-bell"></i>
-                    <span class="icon-badge" id="notification-badge">3</span>
-                </a>
-                <a href="#">
-                    <i class="fas fa-user-circle"></i>
-                </a>
-            </div>
-        </header>
-
-        <!-- Conteúdo de Análises -->
-        <main class="analyses-content" id="analyses-content">
-            <h2>Análises de Apostas</h2>
-            <!-- Gráfico de Acurácia -->
-            <div class="chart-container">
-                <canvas id="accuracyChart"></canvas>
-            </div>
-            <!-- Gráfico de Lucro vs Prejuízo -->
-            <div class="chart-container">
-                <canvas id="profitLossChart"></canvas>
-            </div>
-            <!-- Tabela de Métricas -->
-            <div class="metrics-table">
-                <h3>Resumo das Métricas</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Métrica</th>
-                            <th>Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Acurácia</td>
-                            <td id="accuracy-value">0%</td>
-                        </tr>
-                        <tr>
-                            <td>Lucro Total</td>
-                            <td id="profit-value">R$ 0,00</td>
-                        </tr>
-                        <tr>
-                            <td>Prejuízo Total</td>
-                            <td id="loss-value">R$ 0,00</td>
-                        </tr>
-                        <tr>
-                            <td>Valor Apostado Total</td>
-                            <td id="total-bet-value">R$ 0,00</td>
-                        </tr>
-                        <tr>
-                            <td>Retorno Total</td>
-                            <td id="total-return-value">R$ 0,00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            © 2025 ApostaPro. Todos os direitos reservados.
-        </footer>
-    </div>
-
+    <!-- PapaParse para parsing de CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Estilos CSS -->
     <style>
         /* Reset básico para garantir consistência entre navegadores */
@@ -169,6 +43,12 @@
             --color-table-header: #3b82f6;
             --color-table-text: #1f2937;
             --color-table-border: #d1d5db;
+            --color-cabecalho-fundo: var(--color-white);
+            --color-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+            --color-sidebar-fundo: var(--color-primary);
+            --color-sidebar-ativa: var(--color-secondary);
+            --color-sucesso-borda: #10b981; /* Verde para acerto */
+            --color-erro-borda: #ef4444; /* Vermelho para erro */
         }
 
         /* Estilos para a Sidebar */
@@ -176,9 +56,9 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 250px;
+            width: 220px; /* Largura da sidebar */
             height: 100%;
-            background-color: var(--color-primary);
+            background-color: var(--color-sidebar-fundo);
             color: var(--color-white);
             display: flex;
             flex-direction: column;
@@ -191,7 +71,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background-color: var(--color-secondary);
+            background-color: var(--color-sidebar-ativa);
         }
 
         .logo {
@@ -199,6 +79,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            /* Mantendo apenas o texto do logo */
         }
 
         .close-btn {
@@ -231,10 +112,11 @@
             text-decoration: none;
             transition: background 0.2s;
             border-radius: 4px;
+            font-size: 1rem;
         }
 
         .sidebar-nav a:hover {
-            background-color: var(--color-secondary);
+            background-color: var(--color-sidebar-ativa);
         }
 
         .sidebar-nav i {
@@ -255,41 +137,104 @@
 
         /* Main Content */
         .main-content {
-            margin-left: 250px;
+            margin-left: 220px; /* Ajustar conforme a largura da sidebar */
             display: flex;
             flex-direction: column;
             height: 100vh;
             background-color: var(--color-bg);
             transition: margin-left 0.3s ease-in-out;
+            padding: 20px; /* Adicionar padding para não ficar grudado nas bordas */
+            overflow-y: auto;
         }
 
+        /* Cabeçalho */
         .header {
-            height: 60px;
-            background-color: var(--color-white);
+            height: 70px; /* Aumento da altura para acomodar novos elementos */
+            background-color: var(--color-cabecalho-fundo);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0 30px;
+            box-shadow: 0 2px 4px var(--color-cabecalho-sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
+        /* Botão de Menu para Mobile */
         .menu-btn {
+            display: none; /* Esconder em desktop */
             background: none;
             border: none;
+            color: var(--color-text);
             font-size: 1.5rem;
             cursor: pointer;
-            display: none; /* Esconder em desktop */
         }
 
+        /* Logo no Cabeçalho */
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-primary);
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Barra de Busca */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            max-width: 300px; /* Redução do comprimento da barra de busca */
+            margin: 0 30px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--color-filter-border);
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+            font-size: 1rem;
+            color: var(--color-text);
+        }
+
+        .search-bar button {
+            padding: 10px 15px;
+            border: none;
+            background-color: var(--color-button-bg);
+            color: var(--color-button-text);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .search-bar button:hover {
+            background-color: var(--color-button-hover);
+        }
+
+        /* Ícones de Notificação e Perfil */
         .header-icons {
             display: flex;
             align-items: center;
+            gap: 20px;
         }
 
         .header-icons a {
             color: var(--color-text);
             font-size: 1.2rem;
-            margin-left: 20px;
             position: relative;
             text-decoration: none;
         }
@@ -303,6 +248,57 @@
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 0.7rem;
+        }
+
+        /* Dropdown do Perfil */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown a {
+            color: var(--color-text);
+            font-size: 1.5rem; /* Redução do tamanho da fonte do ícone de perfil */
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .profile-dropdown a:hover {
+            color: var(--color-secondary);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--color-white);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .dropdown-content a {
+            color: var(--color-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--color-filter-bg);
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Conteúdo de Análises */
@@ -373,10 +369,23 @@
             color: var(--color-table-text);
         }
 
+        /* Footer */
+        .footer {
+            height: 40px; /* Redução da altura do rodapé */
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 220px;
             }
 
             .sidebar.active {
@@ -415,25 +424,44 @@
         }
     </style>
 
-    <!-- Bibliotecas Externas -->
-    <!-- PapaParse para parsing de CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Script JavaScript com Firebase Modular SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // Importar as funções necessárias do SDK do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            getDocs, 
+            getDoc, 
+            setDoc, 
+            deleteDoc, 
+            query, 
+            where, 
+            orderBy, 
+            onSnapshot,
+            serverTimestamp,
+            writeBatch
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged, 
+            updateProfile 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/dist/chart.esm.js'; // Correção aqui
 
-        // Sua configuração do Firebase
+        // Registrar os componentes do Chart.js
+        Chart.register(...registerables);
+
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC8147QhLWMcT0NdJGMCZhxS1nDpTOErpI",
             authDomain: "superpro-8d45e.firebaseapp.com",
             projectId: "superpro-8d45e",
-            storageBucket: "superpro-8d45e.firebasestorage.app",
+            storageBucket: "superpro-8d45e.appspot.com",
             messagingSenderId: "732335019424",
             appId: "1:732335019424:web:5a743efffe3d62cc9980c5"
         };
@@ -447,67 +475,75 @@
         const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWlGNMaJfx6YMl0NaV2SIfCCKXxnP4Z51nXI62n0pG-qhHfQsHldYN4eYOtxanC2h2NzyzIfAHH8ax/pub?output=csv';
 
         // Variáveis para armazenamento de dados e métricas
-        let allTips = [];
+        let selectedTips = [];
         let metrics = {
             acertos: 0,
             erros: 0,
-            lucro: 0,
-            prejuizo: 0,
             totalBet: 0,
             totalReturn: 0,
             accuracy: '0.00'
         };
 
-        // Função para buscar dados da planilha
-        const fetchTipsFromSheet = async () => {
+        let accuracyChartInstance = null;
+
+        // Função para buscar dicas selecionadas pelo usuário
+        const fetchSelectedTips = async (user) => {
             try {
+                const selecoesRef = collection(db, 'users', user.uid, 'selecoes');
+                const selecoesSnapshot = await getDocs(selecoesRef);
+
+                if (selecoesSnapshot.empty) {
+                    alert("Nenhuma dica selecionada. Por favor, selecione dicas na página 'Minhas Seleções'.");
+                    document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica selecionada para análise.</p>';
+                    return;
+                }
+
+                const dicaIds = selecoesSnapshot.docs.map(doc => doc.id);
+
+                // Buscar dados da planilha
                 const response = await fetch(sheetURL);
                 if (!response.ok) {
-                    throw new Error(`Erro ao buscar dados: ${response.statusText}`);
+                    throw new Error(`Erro ao buscar dados da planilha: ${response.statusText}`);
                 }
                 const csvData = await response.text();
-                console.log("Dados CSV recebidos:", csvData); // Debug
-                const tips = parseCSV(csvData);
-                console.log("Dicas parseadas:", tips); // Debug
-                allTips = tips; // Armazena todas as dicas
-                calculateMetrics(tips); // Calcula as métricas
-                renderMetrics(); // Atualiza a tabela de métricas
-                renderAccuracyChart(); // Renderiza o gráfico de acurácia
-                renderProfitLossChart(); // Renderiza o gráfico de lucro vs prejuízo
+                const parsedData = Papa.parse(csvData, {
+                    header: true,
+                    skipEmptyLines: true
+                });
+
+                // Filtrar dicas selecionadas
+                selectedTips = parsedData.data.filter(tip => dicaIds.includes(tip.ID));
+
+                if (selectedTips.length === 0) {
+                    alert("Nenhuma dica válida selecionada para análise.");
+                    document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica válida selecionada para análise.</p>';
+                    return;
+                }
+
+                calculateMetrics(selectedTips);
+                renderMetrics();
+                renderAccuracyChart();
             } catch (error) {
-                console.error('Erro ao buscar dicas:', error);
+                console.error('Erro ao buscar dicas selecionadas:', error);
                 document.getElementById('analyses-content').innerHTML = '<p>Erro ao carregar as análises. Por favor, tente novamente mais tarde.</p>';
             }
-        };
-
-        // Função para converter CSV em array de objetos usando PapaParse
-        const parseCSV = (csv) => {
-            const parsed = Papa.parse(csv, {
-                header: true,
-                skipEmptyLines: true
-            });
-            return parsed.data;
         };
 
         // Função para calcular métricas
         const calculateMetrics = (tips) => {
             metrics.acertos = 0;
             metrics.erros = 0;
-            metrics.lucro = 0;
-            metrics.prejuizo = 0;
             metrics.totalBet = 0;
             metrics.totalReturn = 0;
 
             tips.forEach(tip => {
                 const resultado = tip['Resultado'].toLowerCase();
-                if (resultado === 'acertou') metrics.acertos += 1;
-                if (resultado === 'errou') metrics.erros += 1;
+                if (resultado === 'ganhou') metrics.acertos += 1;
+                if (resultado === 'perdeu') metrics.erros += 1;
                 const retorno = parseFloat(tip['Retorno do Valor']);
                 const aposta = parseFloat(tip['Valor Apostado']);
                 metrics.totalBet += aposta;
                 metrics.totalReturn += retorno;
-                if (retorno > 0) metrics.lucro += retorno;
-                if (retorno < 0) metrics.prejuizo += retorno;
             });
 
             // Calcular acurácia
@@ -518,8 +554,6 @@
         // Função para renderizar a tabela de métricas
         const renderMetrics = () => {
             document.getElementById('accuracy-value').innerText = `${metrics.accuracy}%`;
-            document.getElementById('profit-value').innerText = `R$ ${formatCurrency(metrics.lucro)}`;
-            document.getElementById('loss-value').innerText = `R$ ${formatCurrency(metrics.prejuizo)}`;
             document.getElementById('total-bet-value').innerText = `R$ ${formatCurrency(metrics.totalBet)}`;
             document.getElementById('total-return-value').innerText = `R$ ${formatCurrency(metrics.totalReturn)}`;
         };
@@ -534,15 +568,18 @@
         // Função para renderizar o gráfico de acurácia
         const renderAccuracyChart = () => {
             const ctx = document.getElementById('accuracyChart').getContext('2d');
-            const accuracyChart = new Chart(ctx, {
+            if (accuracyChartInstance) {
+                accuracyChartInstance.destroy();
+            }
+            accuracyChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Acertou', 'Errou'],
+                    labels: ['Ganhou', 'Perdeu'],
                     datasets: [{
                         data: [metrics.acertos, metrics.erros],
                         backgroundColor: [
-                            'rgba(16, 185, 129, 0.7)', // Verde para Acertou
-                            'rgba(220, 38, 38, 0.7)'   // Vermelho para Errou
+                            'rgba(16, 185, 129, 0.7)', // Verde para Ganhou
+                            'rgba(220, 38, 38, 0.7)'   // Vermelho para Perdeu
                         ],
                         borderColor: [
                             'rgba(16, 185, 129, 1)',
@@ -566,41 +603,6 @@
             });
         };
 
-        // Função para renderizar o gráfico de lucro vs prejuízo
-        const renderProfitLossChart = () => {
-            const ctx = document.getElementById('profitLossChart').getContext('2d');
-            const profitLossChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Lucro Total', 'Prejuízo Total'],
-                    datasets: [{
-                        data: [metrics.lucro, Math.abs(metrics.prejuizo)],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.7)', // Verde para Lucro
-                            'rgba(220, 38, 38, 0.7)'   // Vermelho para Prejuízo
-                        ],
-                        borderColor: [
-                            'rgba(16, 185, 129, 1)',
-                            'rgba(220, 38, 38, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Lucro vs Prejuízo'
-                        }
-                    }
-                },
-            });
-        };
-
         // Função para fazer login
         const login = async () => {
             const email = prompt("Digite seu e-mail para login:");
@@ -614,7 +616,7 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 alert("Login realizado com sucesso!");
-                fetchTipsFromSheet();
+                // As análises serão atualizadas automaticamente via listener de autenticação
             } catch (error) {
                 alert(`Erro ao fazer login: ${error.message}`);
             }
@@ -637,7 +639,7 @@
                     displayName: username
                 });
                 alert("Registro realizado com sucesso!");
-                fetchTipsFromSheet();
+                // As análises serão atualizadas automaticamente via listener de autenticação
             } catch (error) {
                 alert(`Erro ao registrar: ${error.message}`);
             }
@@ -648,9 +650,10 @@
             try {
                 await signOut(auth);
                 alert("Logout realizado com sucesso!");
-                fetchTipsFromSheet();
+                // As análises serão atualizadas automaticamente via listener de autenticação
             } catch (error) {
                 console.error('Erro ao fazer logout:', error);
+                alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
             }
         };
 
@@ -667,7 +670,15 @@
                 logoutBtn.href = "#";
                 logoutBtn.onclick = (e) => {
                     e.preventDefault();
-                    login();
+                    // Opcional: Implementar lógica de registro se necessário
+                    const action = prompt("Digite 'login' para login ou 'register' para registro:");
+                    if (action.toLowerCase() === 'login') {
+                        login();
+                    } else if (action.toLowerCase() === 'register') {
+                        register();
+                    } else {
+                        alert("Ação inválida.");
+                    }
                 };
             }
         };
@@ -675,6 +686,11 @@
         // Listener para mudanças na autenticação
         onAuthStateChanged(auth, (user) => {
             updateAuthUI(user);
+            if (user) {
+                fetchSelectedTips(user);
+            } else {
+                document.getElementById('analyses-content').innerHTML = '<p>Por favor, faça login para ver as análises.</p>';
+            }
         });
 
         // Função para abrir a sidebar (mobile)
@@ -691,20 +707,153 @@
 
         // Inicialização da Plataforma
         const init = () => {
-            fetchTipsFromSheet();
-
             // Event listener para o botão de menu (abrir sidebar)
-            document.getElementById('menu-btn').addEventListener('click', openSidebar);
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', openSidebar);
+            }
 
             // Event listener para o botão de fechar (fechar sidebar)
-            document.getElementById('close-btn').addEventListener('click', closeSidebarFunc);
+            const closeBtn = document.getElementById('close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebarFunc);
+            }
 
             // Event listener para o overlay (fechar sidebar ao clicar fora)
-            document.getElementById('overlay').addEventListener('click', closeSidebarFunc);
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebarFunc);
+            }
+
+            // Verificar estado de autenticação ao carregar
+            const user = auth.currentUser;
+            if (user) {
+                fetchSelectedTips(user);
+            }
         };
 
         // Chamar a função de inicialização ao carregar a página
         window.onload = init;
     </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">Super Tip</h1>
+            <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="index2.html" aria-label="Home">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="analise.html" aria-label="Análises">
+                        <i class="fas fa-chart-bar"></i>
+                        Análises
+                    </a>
+                </li>
+                <li>
+                    <a href="jogos.html" aria-label="Explorar">
+                        <i class="fas fa-compass"></i>
+                        Explorar
+                    </a>
+                </li>
+                <li>
+                    <a href="selecao.html" aria-label="Minhas Seleções">
+                        <i class="fas fa-list"></i>
+                        Minhas Seleções
+                    </a>
+                </li>
+                <li>
+                    <a href="perfil.html" aria-label="Perfil">
+                        <i class="fas fa-user"></i>
+                        Perfil
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="logout-btn" aria-label="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Overlay para mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Campo de busca opcional -->
+            <div class="header-icons">
+                <a href="#" class="notification-icon" aria-label="Notificações">
+                    <i class="fas fa-bell"></i>
+                    <span class="icon-badge" id="notification-badge">3</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="#" aria-label="Perfil">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="perfil.html">Perfil</a>
+                        <a href="#" class="logout-btn">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Conteúdo de Análises -->
+        <main class="analyses-content" id="analyses-content">
+            <h2>Análises de Apostas</h2>
+            <!-- Gráfico de Acurácia -->
+            <div class="chart-container">
+                <canvas id="accuracyChart"></canvas>
+            </div>
+            <!-- Tabela de Métricas -->
+            <div class="metrics-table">
+                <h3>Resumo das Métricas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Acurácia</td>
+                            <td id="accuracy-value">0%</td>
+                        </tr>
+                        <tr>
+                            <td>Valor Apostado Total</td>
+                            <td id="total-bet-value">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Retorno Total</td>
+                            <td id="total-return-value">R$ 0,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            © 2025 ApostaPro. Todos os direitos reservados.
+        </footer>
+    </div>
 </body>
 </html>
