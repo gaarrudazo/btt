@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minhas Seleções - ApostaPro</title>
+    <title>Minhas Seleções - SuperPro</title>
     <!-- Link para ícones (Font Awesome) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
@@ -416,7 +416,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h1 class="logo">Super Tip</h1>
+            <h1 class="logo">SuperPro</h1>
             <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
                 <i class="fas fa-times"></i>
             </button>
@@ -477,8 +477,8 @@
 
             <!-- Logo no Cabeçalho -->
             <div class="header-logo">
-                <a href="index2.html" aria-label="ApostaPro Home">
-                    <span class="logo-text">ApostaPro</span>
+                <a href="index2.html" aria-label="SuperPro Home">
+                    <span class="logo-text">SuperPro</span>
                 </a>
             </div>
             <!-- Barra de Busca -->
@@ -499,7 +499,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            © 2025 ApostaPro. Todos os direitos reservados.
+            © 2025 SuperPro. Todos os direitos reservados.
         </footer>
     </div>
 
@@ -586,7 +586,11 @@
                 })
                 .catch(erro => {
                     console.error('Erro ao buscar ou processar o CSV:', erro);
-                    alert("Ocorreu um erro ao carregar as dicas. Por favor, tente novamente.");
+                    // Removido o alert para uma experiência mais suave
+                    const container = document.getElementById('selecoes-container');
+                    if (container) {
+                        container.innerHTML = '<p>Ocorreu um erro ao carregar as dicas. Por favor, tente novamente.</p>';
+                    }
                 });
         };
 
@@ -732,7 +736,7 @@
                 await deleteDoc(referenciaDaSelecao);
                 // Recarregar as seleções
                 buscarEProcessarCSV();
-                alert("Seleção removida com sucesso!");
+                // Removido o alert para uma experiência mais suave
                 console.log(`Dica ID: ${idDaDica} removida das seleções.`);
             } catch (erro) {
                 console.error('Erro ao remover seleção:', erro);
@@ -754,7 +758,7 @@
                     };
                 } else {
                     btn.textContent = "Login";
-                    btn.href = "login.html"; // Redirecionar para a página de login
+                    btn.href = "index.html"; // Redirecionar para a página de login (index.html)
                 }
             });
         };
@@ -763,8 +767,9 @@
         const efetuarLogout = async () => {
             try {
                 await signOut(autenticacao);
-                alert("Logout realizado com sucesso!");
+                // Removido o alert para uma experiência mais suave
                 console.log("Usuário deslogado.");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
             } catch (erro) {
                 console.error('Erro ao fazer logout:', erro);
                 alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");

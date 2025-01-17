@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApostaPro - Plataforma de Análises de Apostas Esportivas</title>
+    <title>SuperPro - Plataforma de Análises de Apostas Esportivas</title>
     <!-- Link para ícones (Font Awesome) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
@@ -239,8 +239,6 @@
             border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
-        /* Removido: Ícones de Notificação e Perfil */
-
         /* Filtros */
         .filters {
             display: flex;
@@ -382,6 +380,28 @@
             margin-right: 5px;
         }
 
+        /* Mensagens de Erro e Carregamento */
+        .message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .message.error {
+            color: var(--cor-erro-borda);
+        }
+
+        .message.success {
+            color: var(--cor-sucesso-borda);
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: var(--cor-botao-fundo);
+        }
+
         /* Footer */
         .footer {
             height: 40px; /* Redução da altura do rodapé */
@@ -501,7 +521,13 @@
         }
     </style>
 
-    <!-- Firebase SDK (Abordagem Modular) -->
+    <!-- Favicon vazio para evitar erro 404 -->
+    <link rel="icon" href="data:,">
+
+    <!-- Inclusão da Biblioteca PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <!-- Script JavaScript com Firebase Modular SDK -->
     <script type="module">
         // Importar as funções necessárias do SDK do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -896,6 +922,7 @@
             try {
                 await signOut(auth);
                 alert("Logout realizado com sucesso!");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
             } catch (erro) {
                 console.error('Erro ao fazer logout:', erro);
                 alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
@@ -964,7 +991,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h1 class="logo">Super Tip</h1>
+            <h1 class="logo">SuperPro</h1>
             <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
                 <i class="fas fa-times"></i>
             </button>
@@ -1024,8 +1051,8 @@
             </button>
             <!-- Logo no Cabeçalho -->
             <div class="header-logo">
-                <a href="index2.html" aria-label="ApostaPro Home">
-                    <span class="logo-text">ApostaPro</span>
+                <a href="index2.html" aria-label="SuperPro Home">
+                    <span class="logo-text">SuperPro</span>
                 </a>
             </div>
             <!-- Barra de Busca -->
@@ -1062,8 +1089,9 @@
 
         <!-- Footer -->
         <footer class="footer">
-            © 2025 ApostaPro. Todos os direitos reservados.
+            © 2025 SuperPro. Todos os direitos reservados.
         </footer>
     </div>
 </body>
 </html>
+

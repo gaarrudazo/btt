@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil do Usuário - ApostaPro</title>
+    <title>Perfil do Usuário - SuperPro</title>
     <!-- Link para ícones (Font Awesome) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
@@ -68,6 +68,7 @@
             align-items: center;
             padding: 20px;
             background-color: var(--cor-sidebar-ativa);
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         .logo {
@@ -106,13 +107,16 @@
             padding: 12px 20px;
             color: var(--cor-branca);
             text-decoration: none;
-            transition: background 0.2s;
+            transition: background 0.2s, border 0.2s;
             border-radius: 4px;
             font-size: 1rem;
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            flex-shrink: 0;
         }
 
         .sidebar-nav a:hover {
             background-color: var(--cor-sidebar-ativa);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
         .sidebar-nav i {
@@ -155,6 +159,10 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+            flex-shrink: 0; /* Evitar encolhimento */
+            flex-wrap: wrap; /* Permitir que os elementos envolvam */
+            position: relative; /* Para posicionamento absoluto do menu button */
         }
 
         /* Botão de Menu para Mobile */
@@ -165,12 +173,18 @@
             color: var(--cor-texto);
             font-size: 1.5rem;
             cursor: pointer;
+            position: absolute; /* Posicionar absoluto */
+            left: 20px; /* Alinhar à esquerda */
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         /* Logo no Cabeçalho */
         .header-logo {
             display: flex;
             align-items: center;
+            flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+            justify-content: flex-start; /* Alinhar à esquerda no desktop */
         }
 
         .header-logo a {
@@ -190,116 +204,39 @@
         .search-bar {
             display: flex;
             align-items: center;
-            flex: 1;
-            max-width: 500px;
+            flex: 2 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            max-width: 400px; /* Aumentar para mais espaço */
             margin: 0 30px;
+            width: 100%; /* Garantir que ocupe a largura disponível */
         }
 
         .search-bar input {
             width: 100%;
-            padding: 10px 15px;
+            padding: 5px 12px; /* Aumentado para 32px de altura */
             border: 1px solid var(--cor-filtro-borda);
             border-right: none;
             border-radius: 4px 0 0 4px;
             outline: none;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
             color: var(--cor-texto);
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button {
-            padding: 10px 15px;
-            border: none;
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
             background-color: var(--cor-botao-fundo);
             color: var(--cor-botao-texto);
             border-radius: 0 4px 4px 0;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1rem;
+            transition: background-color 0.3s, border 0.3s;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            height: 32px; /* Definido para controlar a altura */
         }
 
         .search-bar button:hover {
             background-color: var(--cor-botao-hover);
-        }
-
-        /* Ícones de Notificação e Perfil */
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .notification-icon {
-            position: relative;
-            color: var(--cor-texto);
-            font-size: 1.4rem;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .notification-icon:hover {
-            color: var(--cor-secundaria);
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: var(--cor-accent);
-            color: var(--cor-branca);
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7rem;
-        }
-
-        /* Dropdown do Perfil */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown a {
-            color: var(--cor-texto);
-            font-size: 1.8rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .profile-dropdown a:hover {
-            color: var(--cor-secundaria);
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--cor-branca);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 4px;
-            z-index: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .dropdown-content a {
-            color: var(--cor-texto);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-        }
-
-        .dropdown-content a:hover {
-            background-color: var(--cor-filtro-fundo);
-        }
-
-        .profile-dropdown:hover .dropdown-content {
-            display: block;
-            opacity: 1;
-            visibility: visible;
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
         }
 
         /* Formulário de Perfil */
@@ -332,8 +269,7 @@
             color: var(--cor-texto);
         }
 
-        .profile-form input[type="text"],
-        .profile-form input[type="file"] {
+        .profile-form input[type="text"] {
             width: 100%;
             padding: 10px 15px;
             border: 1px solid var(--cor-filtro-borda);
@@ -341,10 +277,6 @@
             outline: none;
             font-size: 1rem;
             color: var(--cor-texto);
-        }
-
-        .profile-form input[type="file"] {
-            padding: 5px 10px;
         }
 
         .profile-form button {
@@ -363,21 +295,6 @@
             background-color: var(--cor-botao-hover);
         }
 
-        /* Imagem de Perfil */
-        .profile-picture {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .profile-picture img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid var(--cor-secundaria);
-        }
-
         /* Footer */
         .footer {
             height: 40px; /* Redução da altura do rodapé */
@@ -388,6 +305,7 @@
             justify-content: center;
             font-size: 0.9rem;
             margin-top: auto;
+            border-top: 1px solid var(--cor-filtro-borda); /* Borda sutil */
         }
 
         /* Responsividade */
@@ -405,7 +323,7 @@
             }
 
             .search-bar {
-                margin: 0 20px;
+                margin: 10px 0;
             }
         }
 
@@ -431,47 +349,33 @@
                 margin-left: 0;
             }
 
-            /* Ajustes no cabeçalho para dispositivos móveis */
+            .feed {
+                padding: 10px;
+            }
+
+            /* Ocultar a barra de busca */
             .search-bar {
-                margin: 0 10px;
-                max-width: 300px;
+                display: none;
             }
 
             /* Botão de Menu visível apenas em mobile */
             .menu-btn {
                 display: block;
+                position: absolute; /* Posicionar absoluto */
+                left: 20px; /* Alinhar à esquerda */
+                top: 50%;
+                transform: translateY(-50%);
             }
 
-            /* Ajustes adicionais para os botões na versão mobile */
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                height: auto;
-                padding: 10px;
+            /* Centralizar o logo */
+            .header-logo {
+                justify-content: center; /* Centralizar o logo */
+                flex: 1;
             }
 
+            /* Ajustar layout da barra de busca para mobile */
             .search-bar {
-                width: 100%;
-                margin: 10px 0;
-            }
-
-            /* Aumento do espaçamento entre o cabeçalho e as dicas */
-            .feed {
-                margin-top: 20px; /* Ajuste conforme necessário */
-            }
-
-            /* Ajustes no formulário de perfil para mobile */
-            .profile-form {
-                padding: 20px;
-            }
-
-            .profile-form h2 {
-                font-size: 1.5rem;
-            }
-
-            .profile-picture img {
-                width: 120px;
-                height: 120px;
+                display: none; /* Garantir que a barra de busca esteja oculta */
             }
         }
 
@@ -487,7 +391,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h1 class="logo">Super Tip</h1>
+            <h1 class="logo">SuperPro</h1>
             <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
                 <i class="fas fa-times"></i>
             </button>
@@ -507,7 +411,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="" aria-label="Explorar">
+                    <a href="jogos.html" aria-label="Explorar">
                         <i class="fas fa-compass"></i>
                         Explorar
                     </a>
@@ -548,8 +452,8 @@
 
             <!-- Logo no Cabeçalho -->
             <div class="header-logo">
-                <a href="index2.html" aria-label="ApostaPro Home">
-                    <span class="logo-text">ApostaPro</span>
+                <a href="index2.html" aria-label="SuperPro Home">
+                    <span class="logo-text">SuperPro</span>
                 </a>
             </div>
             <!-- Barra de Busca -->
@@ -559,39 +463,20 @@
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-            <!-- Ícones de Notificação e Perfil -->
-            <div class="header-icons">
-               
-                <div class="profile-dropdown">
-                    <a href="perfil.html" aria-label="Perfil">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <div class="dropdown-content">
-                        <a href="perfil.html">Meu Perfil</a>
-                        
-                        <a href="#" class="logout-btn">Sair</a>
-                    </div>
-                </div>
-            </div>
+            <!-- Ícones de Notificação e Perfil Removidos -->
         </header>
 
         <!-- Formulário de Perfil -->
         <main class="feed" id="feed">
             <div class="profile-form">
                 <h2>Meu Perfil</h2>
-                <div class="profile-picture">
-                    <!-- Substituído por Picsum ou imagem local -->
-                    <img id="foto-perfil" src="https://picsum.photos/150" alt="Foto de Perfil">
-                </div>
+                <!-- Removido o container da imagem de perfil -->
                 <form id="formulario-perfil">
                     <div class="form-group">
                         <label for="nome-usuario">Nome:</label>
                         <input type="text" id="nome-usuario" name="nome-usuario" required>
                     </div>
-                    <div class="form-group">
-                        <label for="foto-usuario">Foto de Perfil:</label>
-                        <input type="file" id="foto-usuario" name="foto-usuario" accept="image/*">
-                    </div>
+                    <!-- Removida a opção de upload de foto -->
                     <button type="submit">Salvar</button>
                 </form>
             </div>
@@ -599,7 +484,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            © 2025 ApostaPro. Todos os direitos reservados.
+            © 2025 SuperPro. Todos os direitos reservados.
         </footer>
     </div>
 
@@ -620,12 +505,6 @@
             signOut, 
             onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { 
-            getStorage, 
-            ref, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -641,7 +520,6 @@
         const app = initializeApp(firebaseConfig);
         const bancoDeDados = getFirestore(app);
         const autenticacao = getAuth(app);
-        const storage = getStorage(app);
 
         // ------------------- FORMATAR PRIMEIRA LETRA -------------------
         const capitalizeFirstLetter = (string) => {
@@ -684,7 +562,7 @@
                 const fotoURL = dados.fotoURL || 'https://picsum.photos/150'; // Alterado para Picsum
 
                 document.getElementById('nome-usuario').value = nome;
-                document.getElementById('foto-perfil').src = fotoURL;
+                // Removido o elemento da foto de perfil
                 // Armazenar a URL da foto atual para uso posterior
                 window.campoFotoAtual = fotoURL;
                 console.log(`Dados de perfil carregados: Nome - ${nome}, FotoURL - ${fotoURL}`);
@@ -692,47 +570,19 @@
         };
 
         // ------------------- ATUALIZAR DADOS DE PERFIL -------------------
-        const atualizarPerfil = async (usuario, nome, arquivoFoto) => {
+        const atualizarPerfil = async (usuario, nome) => {
             const idDoUsuario = usuario.uid;
             const referenciaDoUsuario = doc(bancoDeDados, 'users', idDoUsuario);
-            let fotoURL = window.campoFotoAtual || '';
-
-            if (arquivoFoto) {
-                // Verificar se o arquivo é uma imagem
-                if (!arquivoFoto.type.startsWith('image/')) {
-                    alert("Por favor, selecione um arquivo de imagem válido.");
-                    return;
-                }
-
-                // Upload da foto para Firebase Storage
-                const referenciaStorage = ref(storage, `profilePictures/${idDoUsuario}/profile.jpg`);
-                try {
-                    await uploadBytes(referenciaStorage, arquivoFoto);
-                    fotoURL = await getDownloadURL(referenciaStorage);
-                    console.log('Foto uploadada com sucesso:', fotoURL);
-                } catch (erro) {
-                    console.error('Erro ao fazer upload da foto:', erro);
-                    alert("Ocorreu um erro ao fazer upload da foto. Por favor, tente novamente.");
-                    return;
-                }
-            }
-
+            
             // Preparar dados para atualização
             const dadosParaAtualizar = { nome: nome };
-            if (arquivoFoto) {
-                dadosParaAtualizar.fotoURL = fotoURL;
-            }
 
-            // Atualizar Firestore com o novo nome e fotoURL (se houver)
+            // Atualizar Firestore com o novo nome
             try {
                 await updateDoc(referenciaDoUsuario, dadosParaAtualizar);
-                alert("Perfil atualizado com sucesso!");
+                // Removido o alert para uma experiência mais suave
                 console.log("Perfil atualizado.");
-                // Atualizar a imagem de perfil na interface, se uma nova foto foi carregada
-                if (arquivoFoto && fotoURL) {
-                    document.getElementById('foto-perfil').src = fotoURL;
-                    window.campoFotoAtual = fotoURL;
-                }
+                // Atualizar a interface conforme necessário
             } catch (erro) {
                 console.error('Erro ao atualizar o perfil:', erro);
                 alert("Ocorreu um erro ao atualizar o perfil. Por favor, tente novamente.");
@@ -753,7 +603,7 @@
                     };
                 } else {
                     btn.textContent = "Login";
-                    btn.href = "login.html"; // Redirecionar para a página de login
+                    btn.href = "index.html"; // Redirecionar para a página de login (index.html)
                 }
             });
         };
@@ -762,8 +612,9 @@
         const efetuarLogout = async () => {
             try {
                 await signOut(autenticacao);
-                alert("Logout realizado com sucesso!");
+                // Removido o alert para uma experiência mais suave
                 console.log("Usuário deslogado.");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
             } catch (erro) {
                 console.error('Erro ao fazer logout:', erro);
                 alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
@@ -779,8 +630,6 @@
                 await carregarDadosDePerfil(usuario);
             } else {
                 console.log('Nenhum usuário autenticado');
-                // Opcional: redirecionar para a página de login
-                // window.location.href = 'login.html';
                 const container = document.querySelector('.profile-form');
                 if (container) {
                     container.innerHTML = '<p>Por favor, faça login para acessar o perfil.</p>';
@@ -802,14 +651,11 @@
             }
 
             const nome = document.getElementById('nome-usuario').value.trim();
-            const arquivoFotoInput = document.getElementById('foto-usuario');
-            const arquivoFoto = arquivoFotoInput.files[0];
 
             console.log(`Nome a ser atualizado: ${nome}`);
-            console.log(`Arquivo de foto selecionado:`, arquivoFoto);
 
             // Atualizar o perfil
-            await atualizarPerfil(usuario, nome, arquivoFoto);
+            await atualizarPerfil(usuario, nome);
         });
 
         // ------------------- INICIALIZAÇÃO -------------------
@@ -844,7 +690,7 @@
 
         window.onload = () => {
             inicializarPagina(); // Função já existente para a Sidebar
-            // buscarEProcessarCSV(); // Não necessário nesta página
+            // Não necessário chamar outras funções nesta página
         };
     </script>
 </body>

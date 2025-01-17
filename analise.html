@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApostaPro - Análises e Gráficos</title>
+    <title>SuperPro - Análises e Gráficos</title>
     <!-- Link para ícones (Font Awesome) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse para parsing de CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Estilos CSS -->
     <style>
         /* Reset básico para garantir consistência entre navegadores */
@@ -47,8 +43,9 @@
             --color-cabecalho-sombra: rgba(0, 0, 0, 0.1);
             --color-sidebar-fundo: var(--color-primary);
             --color-sidebar-ativa: var(--color-secondary);
-            --color-sucesso-borda: #10b981; /* Verde para acerto */
-            --color-erro-borda: #ef4444; /* Vermelho para erro */
+            --color-loading: #3b82f6; /* Azul para carregamento */
+            --color-error: #ef4444; /* Vermelho para erros */
+            --color-success: #10b981; /* Verde para sucessos */
         }
 
         /* Estilos para a Sidebar */
@@ -153,17 +150,19 @@
             background-color: var(--color-cabecalho-fundo);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center; /* Centraliza os itens */
             padding: 0 30px;
             box-shadow: 0 2px 4px var(--color-cabecalho-sombra);
             position: sticky;
             top: 0;
             z-index: 100;
+            position: relative; /* Para posicionamento absoluto do botão de menu */
         }
 
         /* Botão de Menu para Mobile */
         .menu-btn {
-            display: none; /* Esconder em desktop */
+            position: absolute;
+            left: 20px;
             background: none;
             border: none;
             color: var(--color-text);
@@ -172,133 +171,13 @@
         }
 
         /* Logo no Cabeçalho */
-        .header-logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-logo a {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: var(--color-primary);
-        }
-
         .logo-text {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.8rem;
             font-weight: 700;
-        }
-
-        /* Barra de Busca */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            flex: 1;
-            max-width: 300px; /* Redução do comprimento da barra de busca */
-            margin: 0 30px;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid var(--color-filter-border);
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            outline: none;
-            font-size: 1rem;
-            color: var(--color-text);
-        }
-
-        .search-bar button {
-            padding: 10px 15px;
-            border: none;
-            background-color: var(--color-button-bg);
-            color: var(--color-button-text);
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1rem;
-        }
-
-        .search-bar button:hover {
-            background-color: var(--color-button-hover);
-        }
-
-        /* Ícones de Notificação e Perfil */
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-icons a {
-            color: var(--color-text);
-            font-size: 1.2rem;
-            position: relative;
-            text-decoration: none;
-        }
-
-        .icon-badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: var(--color-accent);
-            color: var(--color-white);
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7rem;
-        }
-
-        /* Dropdown do Perfil */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown a {
-            color: var(--color-text);
-            font-size: 1.5rem; /* Redução do tamanho da fonte do ícone de perfil */
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .profile-dropdown a:hover {
-            color: var(--color-secondary);
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--color-white);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 4px;
-            z-index: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .dropdown-content a {
-            color: var(--color-text);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-        }
-
-        .dropdown-content a:hover {
-            background-color: var(--color-filter-bg);
-        }
-
-        .profile-dropdown:hover .dropdown-content {
-            display: block;
-            opacity: 1;
-            visibility: visible;
+            color: var(--color-primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-align: center;
         }
 
         /* Conteúdo de Análises */
@@ -369,6 +248,28 @@
             color: var(--color-table-text);
         }
 
+        /* Mensagens de Erro e Carregamento */
+        .message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .message.error {
+            color: var(--color-error);
+        }
+
+        .message.success {
+            color: var(--color-success);
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: var(--color-loading);
+        }
+
         /* Footer */
         .footer {
             height: 40px; /* Redução da altura do rodapé */
@@ -401,7 +302,8 @@
             }
 
             .menu-btn {
-                display: block;
+                position: absolute;
+                left: 20px;
             }
 
             .main-content {
@@ -421,8 +323,18 @@
                 max-width: 100%;
                 padding: 15px;
             }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
         }
     </style>
+
+    <!-- Favicon vazio para evitar erro 404 -->
+    <link rel="icon" href="data:,">
+
+    <!-- Inclusão da Biblioteca PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <!-- Script JavaScript com Firebase Modular SDK -->
     <script type="module">
@@ -431,17 +343,7 @@
         import { 
             getFirestore, 
             collection, 
-            doc, 
-            getDocs, 
-            getDoc, 
-            setDoc, 
-            deleteDoc, 
-            query, 
-            where, 
-            orderBy, 
-            onSnapshot,
-            serverTimestamp,
-            writeBatch
+            getDocs 
         } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { 
             getAuth, 
@@ -451,7 +353,7 @@
             onAuthStateChanged, 
             updateProfile 
         } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/dist/chart.esm.js'; // Correção aqui
+        import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.esm.js'; // Correção aqui
 
         // Registrar os componentes do Chart.js
         Chart.register(...registerables);
@@ -477,10 +379,8 @@
         // Variáveis para armazenamento de dados e métricas
         let selectedTips = [];
         let metrics = {
-            acertos: 0,
-            erros: 0,
-            totalBet: 0,
-            totalReturn: 0,
+            acertos: 0, // Ganhou
+            erros: 0,    // Perdeu
             accuracy: '0.00'
         };
 
@@ -488,12 +388,15 @@
 
         // Função para buscar dicas selecionadas pelo usuário
         const fetchSelectedTips = async (user) => {
+            mostrarCarregamento(true);
+            limparMensagens();
+
             try {
                 const selecoesRef = collection(db, 'users', user.uid, 'selecoes');
                 const selecoesSnapshot = await getDocs(selecoesRef);
 
                 if (selecoesSnapshot.empty) {
-                    alert("Nenhuma dica selecionada. Por favor, selecione dicas na página 'Minhas Seleções'.");
+                    exibirMensagem('Nenhuma dica selecionada. Por favor, selecione dicas na página "Minhas Seleções".', 'error');
                     document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica selecionada para análise.</p>';
                     return;
                 }
@@ -515,35 +418,32 @@
                 selectedTips = parsedData.data.filter(tip => dicaIds.includes(tip.ID));
 
                 if (selectedTips.length === 0) {
-                    alert("Nenhuma dica válida selecionada para análise.");
+                    exibirMensagem('Nenhuma dica válida selecionada para análise.', 'error');
                     document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica válida selecionada para análise.</p>';
                     return;
                 }
 
-                calculateMetrics(selectedTips);
-                renderMetrics();
-                renderAccuracyChart();
+                calcularMetricas(selectedTips);
+                renderizarMetricas();
+                renderizarGraficoAcuracia();
             } catch (error) {
                 console.error('Erro ao buscar dicas selecionadas:', error);
+                exibirMensagem('Erro ao carregar as análises. Por favor, tente novamente mais tarde.', 'error');
                 document.getElementById('analyses-content').innerHTML = '<p>Erro ao carregar as análises. Por favor, tente novamente mais tarde.</p>';
+            } finally {
+                mostrarCarregamento(false);
             }
         };
 
         // Função para calcular métricas
-        const calculateMetrics = (tips) => {
+        const calcularMetricas = (tips) => {
             metrics.acertos = 0;
             metrics.erros = 0;
-            metrics.totalBet = 0;
-            metrics.totalReturn = 0;
 
             tips.forEach(tip => {
-                const resultado = tip['Resultado'].toLowerCase();
+                const resultado = tip['Resultado'] ? tip['Resultado'].toLowerCase() : '';
                 if (resultado === 'ganhou') metrics.acertos += 1;
                 if (resultado === 'perdeu') metrics.erros += 1;
-                const retorno = parseFloat(tip['Retorno do Valor']);
-                const aposta = parseFloat(tip['Valor Apostado']);
-                metrics.totalBet += aposta;
-                metrics.totalReturn += retorno;
             });
 
             // Calcular acurácia
@@ -552,21 +452,13 @@
         };
 
         // Função para renderizar a tabela de métricas
-        const renderMetrics = () => {
-            document.getElementById('accuracy-value').innerText = `${metrics.accuracy}%`;
-            document.getElementById('total-bet-value').innerText = `R$ ${formatCurrency(metrics.totalBet)}`;
-            document.getElementById('total-return-value').innerText = `R$ ${formatCurrency(metrics.totalReturn)}`;
-        };
-
-        // Função para formatar valores monetários
-        const formatCurrency = (value) => {
-            const number = parseFloat(value);
-            if (isNaN(number)) return '0,00';
-            return number.toFixed(2).replace('.', ',');
+        const renderizarMetricas = () => {
+            document.getElementById('acertos-value').innerText = `${metrics.acertos}`;
+            document.getElementById('erros-value').innerText = `${metrics.erros}`;
         };
 
         // Função para renderizar o gráfico de acurácia
-        const renderAccuracyChart = () => {
+        const renderizarGraficoAcuracia = () => {
             const ctx = document.getElementById('accuracyChart').getContext('2d');
             if (accuracyChartInstance) {
                 accuracyChartInstance.destroy();
@@ -596,11 +488,47 @@
                         },
                         title: {
                             display: true,
-                            text: 'Acurácia das Apostas'
+                            text: 'Resultado das Apostas'
                         }
                     }
                 },
             });
+        };
+
+        // Função para mostrar ou esconder o indicador de carregamento
+        const mostrarCarregamento = (mostrar) => {
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) {
+                if (mostrar) {
+                    loadingElement.style.display = 'block';
+                } else {
+                    loadingElement.style.display = 'none';
+                }
+            }
+        };
+
+        // Função para exibir mensagens de erro ou sucesso
+        const exibirMensagem = (mensagem, tipo) => {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.innerText = mensagem;
+                if (tipo === 'error') {
+                    messageElement.classList.remove('success');
+                    messageElement.classList.add('error');
+                } else if (tipo === 'success') {
+                    messageElement.classList.remove('error');
+                    messageElement.classList.add('success');
+                }
+            }
+        };
+
+        // Função para limpar mensagens anteriores
+        const limparMensagens = () => {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.innerText = '';
+                messageElement.classList.remove('error', 'success');
+            }
         };
 
         // Função para fazer login
@@ -609,16 +537,16 @@
             const password = prompt("Digite sua senha:");
 
             if (!email || !password) {
-                alert("Email e senha são obrigatórios para login.");
+                exibirMensagem("Email e senha são obrigatórios para login.", "error");
                 return;
             }
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                alert("Login realizado com sucesso!");
+                exibirMensagem("Login realizado com sucesso!", "success");
                 // As análises serão atualizadas automaticamente via listener de autenticação
             } catch (error) {
-                alert(`Erro ao fazer login: ${error.message}`);
+                exibirMensagem(`Erro ao fazer login: ${error.message}`, "error");
             }
         };
 
@@ -629,7 +557,7 @@
             const username = prompt("Digite seu nome de usuário:");
 
             if (!email || !password || !username) {
-                alert("Email, senha e nome de usuário são obrigatórios para registro.");
+                exibirMensagem("Email, senha e nome de usuário são obrigatórios para registro.", "error");
                 return;
             }
 
@@ -638,10 +566,10 @@
                 await updateProfile(userCredential.user, {
                     displayName: username
                 });
-                alert("Registro realizado com sucesso!");
+                exibirMensagem("Registro realizado com sucesso!", "success");
                 // As análises serão atualizadas automaticamente via listener de autenticação
             } catch (error) {
-                alert(`Erro ao registrar: ${error.message}`);
+                exibirMensagem(`Erro ao registrar: ${error.message}`, "error");
             }
         };
 
@@ -649,37 +577,41 @@
         const logout = async () => {
             try {
                 await signOut(auth);
-                alert("Logout realizado com sucesso!");
-                // As análises serão atualizadas automaticamente via listener de autenticação
+                exibirMensagem("Logout realizado com sucesso!", "success");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
             } catch (error) {
                 console.error('Erro ao fazer logout:', error);
-                alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
+                exibirMensagem("Ocorreu um erro ao fazer logout. Por favor, tente novamente.", "error");
             }
         };
 
         // Atualizar UI baseado no estado de autenticação
         const updateAuthUI = (user) => {
-            const logoutBtn = document.getElementById('logout-btn');
+            const logoutBtnSidebar = document.querySelectorAll('.logout-btn');
             if (user) {
-                logoutBtn.href = "#";
-                logoutBtn.onclick = (e) => {
-                    e.preventDefault();
-                    logout();
-                };
+                logoutBtnSidebar.forEach(btn => {
+                    btn.href = "#";
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        logout();
+                    };
+                });
             } else {
-                logoutBtn.href = "#";
-                logoutBtn.onclick = (e) => {
-                    e.preventDefault();
-                    // Opcional: Implementar lógica de registro se necessário
-                    const action = prompt("Digite 'login' para login ou 'register' para registro:");
-                    if (action.toLowerCase() === 'login') {
-                        login();
-                    } else if (action.toLowerCase() === 'register') {
-                        register();
-                    } else {
-                        alert("Ação inválida.");
-                    }
-                };
+                logoutBtnSidebar.forEach(btn => {
+                    btn.href = "#";
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        // Implementar lógica de login/registro
+                        const action = prompt("Digite 'login' para login ou 'register' para registro:");
+                        if (action && action.toLowerCase() === 'login') {
+                            login();
+                        } else if (action && action.toLowerCase() === 'register') {
+                            register();
+                        } else {
+                            exibirMensagem("Ação inválida. Por favor, tente novamente.", "error");
+                        }
+                    };
+                });
             }
         };
 
@@ -689,20 +621,30 @@
             if (user) {
                 fetchSelectedTips(user);
             } else {
-                document.getElementById('analyses-content').innerHTML = '<p>Por favor, faça login para ver as análises.</p>';
+                document.getElementById('analyses-content').innerHTML = `
+                    <p>Por favor, faça login para ver as análises.</p>
+                `;
             }
         });
 
         // Função para abrir a sidebar (mobile)
         const openSidebar = () => {
-            document.getElementById('sidebar').classList.add('active');
-            document.getElementById('overlay').classList.add('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            }
         };
 
         // Função para fechar a sidebar (mobile)
         const closeSidebarFunc = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
         };
 
         // Inicialização da Plataforma
@@ -740,7 +682,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h1 class="logo">Super Tip</h1>
+            <h1 class="logo">SuperPro</h1>
             <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
                 <i class="fas fa-times"></i>
             </button>
@@ -797,31 +739,26 @@
             <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Campo de busca opcional -->
-            <div class="header-icons">
-                <a href="#" class="notification-icon" aria-label="Notificações">
-                    <i class="fas fa-bell"></i>
-                    <span class="icon-badge" id="notification-badge">3</span>
-                </a>
-                <div class="profile-dropdown">
-                    <a href="#" aria-label="Perfil">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                    <div class="dropdown-content">
-                        <a href="perfil.html">Perfil</a>
-                        <a href="#" class="logout-btn">Sair</a>
-                    </div>
-                </div>
-            </div>
+            <h1 class="logo-text">SuperPro</h1>
         </header>
 
         <!-- Conteúdo de Análises -->
         <main class="analyses-content" id="analyses-content">
             <h2>Análises de Apostas</h2>
+
+            <!-- Mensagem de Erro ou Sucesso -->
+            <div id="message" class="message"></div>
+
+            <!-- Indicador de Carregamento -->
+            <div id="loading" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando análises...
+            </div>
+
             <!-- Gráfico de Acurácia -->
             <div class="chart-container">
                 <canvas id="accuracyChart"></canvas>
             </div>
+
             <!-- Tabela de Métricas -->
             <div class="metrics-table">
                 <h3>Resumo das Métricas</h3>
@@ -834,16 +771,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Acurácia</td>
-                            <td id="accuracy-value">0%</td>
+                            <td>Ganhou</td>
+                            <td id="acertos-value">0</td>
                         </tr>
                         <tr>
-                            <td>Valor Apostado Total</td>
-                            <td id="total-bet-value">R$ 0,00</td>
-                        </tr>
-                        <tr>
-                            <td>Retorno Total</td>
-                            <td id="total-return-value">R$ 0,00</td>
+                            <td>Perdeu</td>
+                            <td id="erros-value">0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -852,7 +785,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            © 2025 ApostaPro. Todos os direitos reservados.
+            © 2025 SuperPro. Todos os direitos reservados.
         </footer>
     </div>
 </body>
