@@ -2,14 +2,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApostaPro - Integração API-Football</title>
-    <!-- Link para Font Awesome (opcional para ícones) -->
+    <title>ApostaPro - Próximos Jogos e Placar Ao Vivo</title>
+    <!-- Favicon (Opcional) -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Link para Google Fonts -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
-    <!-- Estilos CSS -->
     <style>
         /* Reset básico */
         * {
@@ -44,6 +43,39 @@
         /* Estilos do Main */
         main {
             padding: 20px;
+            margin-bottom: 60px; /* Espaço para o footer fixo */
+        }
+
+        /* Navegação */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        nav button {
+            background-color: var(--color-button-bg);
+            color: var(--color-button-text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover {
+            background-color: var(--color-button-hover);
+        }
+
+        /* Seções */
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
         }
 
         /* Seção de Seleção de Liga */
@@ -53,6 +85,7 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 20px;
+            justify-content: center;
         }
 
         .league-selection label {
@@ -82,7 +115,7 @@
         }
 
         /* Container das Partidas */
-        #matches-container {
+        .matches-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
@@ -94,17 +127,25 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .match-card h3 {
             margin-bottom: 10px;
             color: var(--color-primary);
+            font-size: 1.2rem;
         }
 
         .match-details {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
 
         .team {
@@ -116,11 +157,26 @@
         .team img {
             width: 30px;
             height: 30px;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .match-time {
             font-weight: bold;
             color: var(--color-secondary);
+        }
+
+        .match-score {
+            margin-top: 10px;
+            font-weight: bold;
+            color: var(--color-accent);
+        }
+
+        /* Mensagens de Erro */
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
         }
 
         /* Estilos do Footer */
@@ -136,40 +192,83 @@
 
         /* Responsividade */
         @media (max-width: 600px) {
-            .league-selection {
+            nav {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
             }
 
             footer {
                 position: static;
+            }
+
+            .league-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .match-card {
+                padding: 10px;
+            }
+
+            .match-card h3 {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>ApostaPro - Partidas da Liga</h1>
+        <h1>ApostaPro</h1>
     </header>
-    
+
     <main>
-        <section class="league-selection">
-            <label for="league">Selecione a Liga:</label>
-            <select id="league">
-                <option value="">--Escolha uma Liga--</option>
-                <option value="39">Premier League (Inglaterra)</option>
-                <option value="140">La Liga (Espanha)</option>
-                <option value="78">Serie A (Itália)</option>
-                <option value="135">Bundesliga (Alemanha)</option>
-                <option value="61">Ligue 1 (França)</option>
-                <option value="80">Primeira Liga (Portugal)</option>
-                <!-- Adicione mais ligas conforme necessário -->
-            </select>
-            <button id="fetch-btn">Buscar Partidas</button>
+        <nav>
+            <button id="btn-next-matches">Próximos Jogos</button>
+            <button id="btn-live-scores">Placar Ao Vivo</button>
+        </nav>
+
+        <!-- Seção Próximos Jogos -->
+        <section id="section-next-matches" class="section active">
+            <div class="league-selection">
+                <label for="league-next">Selecione a Liga:</label>
+                <select id="league-next">
+                    <option value="">--Escolha uma Liga--</option>
+                    <option value="2021">Premier League (Inglaterra)</option>
+                    <option value="2014">La Liga (Espanha)</option>
+                    <option value="2019">Serie A (Itália)</option>
+                    <option value="2002">Bundesliga (Alemanha)</option>
+                    <option value="2015">Ligue 1 (França)</option>
+                    <option value="2016">Primeira Liga (Portugal)</option>
+                    <!-- Adicione mais ligas conforme necessário -->
+                </select>
+                <button id="fetch-next-btn">Buscar Próximos Jogos</button>
+            </div>
+
+            <section id="matches-container-next" class="matches-container">
+                <!-- As partidas serão exibidas aqui -->
+            </section>
         </section>
 
-        <section id="matches-container">
-            <!-- As partidas serão exibidas aqui -->
+        <!-- Seção Placar Ao Vivo -->
+        <section id="section-live-scores" class="section">
+            <div class="league-selection">
+                <label for="league-live">Selecione a Liga:</label>
+                <select id="league-live">
+                    <option value="">--Escolha uma Liga--</option>
+                    <option value="2021">Premier League (Inglaterra)</option>
+                    <option value="2014">La Liga (Espanha)</option>
+                    <option value="2019">Serie A (Itália)</option>
+                    <option value="2002">Bundesliga (Alemanha)</option>
+                    <option value="2015">Ligue 1 (França)</option>
+                    <option value="2016">Primeira Liga (Portugal)</option>
+                    <!-- Adicione mais ligas conforme necessário -->
+                </select>
+                <button id="fetch-live-btn">Buscar Placar Ao Vivo</button>
+            </div>
+
+            <section id="matches-container-live" class="matches-container">
+                <!-- Os placares ao vivo serão exibidos aqui -->
+            </section>
         </section>
     </main>
 
@@ -179,86 +278,159 @@
 
     <!-- JavaScript -->
     <script>
-        // Sua chave de API-Football
-        const API_KEY = 'b77014eeea8142d354a2e0479bcc2d08';
-        const API_HOST = 'v3.football.api-sports.io';
+        // Botões de navegação
+        const btnNextMatches = document.getElementById('btn-next-matches');
+        const btnLiveScores = document.getElementById('btn-live-scores');
 
-        // Função para buscar partidas de uma liga específica
-        const fetchMatches = async (leagueId) => {
-            const season = 2023; // Ajuste o ano conforme necessário
-            const url = `https://${API_HOST}/fixtures?league=${leagueId}&season=${season}`;
+        // Seções
+        const sectionNextMatches = document.getElementById('section-next-matches');
+        const sectionLiveScores = document.getElementById('section-live-scores');
+
+        // Função para alternar seções
+        btnNextMatches.addEventListener('click', () => {
+            sectionNextMatches.classList.add('active');
+            sectionLiveScores.classList.remove('active');
+        });
+
+        btnLiveScores.addEventListener('click', () => {
+            sectionLiveScores.classList.add('active');
+            sectionNextMatches.classList.remove('active');
+        });
+
+        /**
+         * Função para buscar próximos jogos.
+         * @param {string} leagueId - ID da liga.
+         * @param {string} season - Temporada.
+         */
+        const fetchNextMatches = async (leagueId, season) => {
+            if (!leagueId || !season) {
+                alert('Por favor, selecione uma liga.');
+                return;
+            }
+
+            const url = `/api/next-matches?leagueId=${leagueId}&season=${season}`;
 
             try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'x-apisports-key': API_KEY
-                    }
-                });
-
+                const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`Erro: ${response.status} ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Erro: ${response.status} ${response.statusText}`);
                 }
 
                 const data = await response.json();
-
-                if (data.response && data.response.length > 0) {
-                    displayMatches(data.response);
-                } else {
-                    document.getElementById('matches-container').innerHTML = '<p>Nenhuma partida encontrada para esta liga.</p>';
-                }
+                console.log('Próximos Jogos:', data);
+                displayMatches(data.data, 'next'); // Ajuste conforme a estrutura da resposta da API
             } catch (error) {
-                console.error('Erro ao buscar partidas:', error);
-                document.getElementById('matches-container').innerHTML = `<p>Ocorreu um erro ao buscar partidas: ${error.message}</p>`;
+                console.error('Erro ao buscar próximos jogos:', error);
+                document.getElementById('matches-container-next').innerHTML = `<p class="error-message">Ocorreu um erro ao buscar próximos jogos: ${error.message}</p>`;
             }
         };
 
-        // Função para exibir as partidas na página
-        const displayMatches = (matches) => {
-            const container = document.getElementById('matches-container');
+        /**
+         * Função para buscar placares ao vivo.
+         * @param {string} leagueId - ID da liga.
+         */
+        const fetchLiveScores = async (leagueId) => {
+            if (!leagueId) {
+                alert('Por favor, selecione uma liga.');
+                return;
+            }
+
+            const url = `/api/live-scores?leagueId=${leagueId}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Erro: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Placar Ao Vivo:', data);
+                displayMatches(data.data, 'live'); // Ajuste conforme a estrutura da resposta da API
+            } catch (error) {
+                console.error('Erro ao buscar placares ao vivo:', error);
+                document.getElementById('matches-container-live').innerHTML = `<p class="error-message">Ocorreu um erro ao buscar placares ao vivo: ${error.message}</p>`;
+            }
+        };
+
+        /**
+         * Função para exibir as partidas na página.
+         * @param {Array} matches - Array de objetos de partidas.
+         * @param {string} type - Tipo de exibição ('next' ou 'live').
+         */
+        const displayMatches = (matches, type) => {
+            const container = type === 'next' ? document.getElementById('matches-container-next') : document.getElementById('matches-container-live');
             container.innerHTML = ''; // Limpa o conteúdo anterior
 
+            if (!matches || matches.length === 0) {
+                container.innerHTML = '<p>Nenhuma partida encontrada.</p>';
+                return;
+            }
+
             matches.forEach(match => {
-                const matchDate = new Date(match.fixture.date);
+                const matchDate = new Date(match.utcDate);
                 const hours = matchDate.getHours().toString().padStart(2, '0');
                 const minutes = matchDate.getMinutes().toString().padStart(2, '0');
                 const time = `${hours}:${minutes}`;
+                const date = matchDate.toLocaleDateString('pt-BR');
 
                 const matchCard = document.createElement('div');
                 matchCard.classList.add('match-card');
 
                 matchCard.innerHTML = `
-                    <h3>${match.league.name}</h3>
+                    <h3>${match.competition.name}</h3>
                     <div class="match-details">
                         <div class="team">
-                            <img src="${match.teams.home.logo}" alt="${match.teams.home.name}">
-                            <span>${match.teams.home.name}</span>
+                            <img src="${match.localteam.logo_path || 'https://via.placeholder.com/30'}" alt="${match.localteam.name}">
+                            <span>${match.localteam.name}</span>
                         </div>
                         <span>VS</span>
                         <div class="team">
-                            <img src="${match.teams.away.logo}" alt="${match.teams.away.name}">
-                            <span>${match.teams.away.name}</span>
+                            <img src="${match.visitorteam.logo_path || 'https://via.placeholder.com/30'}" alt="${match.visitorteam.name}">
+                            <span>${match.visitorteam.name}</span>
                         </div>
                     </div>
                     <div class="match-time">
-                        <i class="fas fa-clock"></i> ${time} 
+                        <i class="fas fa-clock"></i> ${date} ${time} 
                     </div>
+                    ${type === 'live' && match.scores ? `<div class="match-score">Placar: ${match.scores.ft_home} - ${match.scores.ft_away}</div>` : ''}
                 `;
 
                 container.appendChild(matchCard);
             });
         };
 
-        // Event listener para o botão de buscar partidas
-        document.getElementById('fetch-btn').addEventListener('click', () => {
-            const leagueSelect = document.getElementById('league');
+        // Evento de clique no botão de buscar próximos jogos
+        document.getElementById('fetch-next-btn').addEventListener('click', () => {
+            const leagueSelect = document.getElementById('league-next');
             const leagueId = leagueSelect.value;
+            const season = new Date().getFullYear(); // Temporada atual
 
             if (leagueId) {
-                fetchMatches(leagueId);
+                fetchNextMatches(leagueId, season);
             } else {
                 alert('Por favor, selecione uma liga.');
             }
+        });
+
+        // Evento de clique no botão de buscar placar ao vivo
+        document.getElementById('fetch-live-btn').addEventListener('click', () => {
+            const leagueSelect = document.getElementById('league-live');
+            const leagueId = leagueSelect.value;
+
+            if (leagueId) {
+                fetchLiveScores(leagueId);
+            } else {
+                alert('Por favor, selecione uma liga.');
+            }
+        });
+
+        // Carregar a seção inicial
+        window.addEventListener('DOMContentLoaded', () => {
+            // Por padrão, exibir a seção de Próximos Jogos
+            sectionNextMatches.classList.add('active');
+            sectionLiveScores.classList.remove('active');
         });
     </script>
 </body>
