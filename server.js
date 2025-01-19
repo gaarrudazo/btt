@@ -1,5 +1,3 @@
-// api/server.js
-
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -14,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas para servir os arquivos estáticos do frontend
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname)));
 
 // Endpoint para buscar próximos jogos
 app.get('/api/next-matches', async (req, res) => {
@@ -77,7 +75,12 @@ app.get('/api/live-scores', async (req, res) => {
 
 // Rota principal para servir o frontend
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Fallback para outras rotas (útil para SPAs)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Exporta a função handler para o Vercel
