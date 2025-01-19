@@ -22,11 +22,17 @@ app.get('/api/next-matches', async (req, res) => {
         return res.status(400).json({ error: 'Parâmetros leagueId e season são obrigatórios.' });
     }
 
+    // Verifique se as variáveis de ambiente estão definidas
+    if (!process.env.BASE_URL || !process.env.API_KEY) {
+        console.error('Variáveis de ambiente BASE_URL ou API_KEY não estão definidas.');
+        return res.status(500).json({ error: 'Configuração do servidor inválida.' });
+    }
+
     try {
-        const response = await axios.get(`${process.env.BASE_URL}/livescores/matches`, {
+        const response = await axios.get(`${process.env.BASE_URL}/matches`, {
             params: {
-                leagueId,
-                season,
+                league_id: leagueId, // Confirmar o nome correto do parâmetro
+                season_id: season,    // Confirmar o nome correto do parâmetro
                 status: 'SCHEDULED',
                 api_token: process.env.API_KEY
             },
@@ -52,10 +58,16 @@ app.get('/api/live-scores', async (req, res) => {
         return res.status(400).json({ error: 'Parâmetro leagueId é obrigatório.' });
     }
 
+    // Verifique se as variáveis de ambiente estão definidas
+    if (!process.env.BASE_URL || !process.env.API_KEY) {
+        console.error('Variáveis de ambiente BASE_URL ou API_KEY não estão definidas.');
+        return res.status(500).json({ error: 'Configuração do servidor inválida.' });
+    }
+
     try {
-        const response = await axios.get(`${process.env.BASE_URL}/livescores/matches`, {
+        const response = await axios.get(`${process.env.BASE_URL}/matches`, {
             params: {
-                leagueId,
+                league_id: leagueId, // Confirmar o nome correto do parâmetro
                 status: 'LIVE',
                 api_token: process.env.API_KEY
             },
