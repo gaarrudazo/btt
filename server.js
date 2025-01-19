@@ -31,8 +31,8 @@ app.get('/api/next-matches', async (req, res) => {
     try {
         const response = await axios.get(`${process.env.BASE_URL}/matches`, {
             params: {
-                league_id: leagueId, // Confirmar o nome correto do parâmetro
-                season_id: season,    // Confirmar o nome correto do parâmetro
+                league_id: leagueId, // Confirmar o nome correto do parâmetro na documentação
+                season_id: season,    // Confirmar o nome correto do parâmetro na documentação
                 status: 'SCHEDULED',
                 api_token: process.env.API_KEY
             },
@@ -67,7 +67,7 @@ app.get('/api/live-scores', async (req, res) => {
     try {
         const response = await axios.get(`${process.env.BASE_URL}/matches`, {
             params: {
-                league_id: leagueId, // Confirmar o nome correto do parâmetro
+                league_id: leagueId, // Confirmar o nome correto do parâmetro na documentação
                 status: 'LIVE',
                 api_token: process.env.API_KEY
             },

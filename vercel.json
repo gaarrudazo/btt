@@ -37,7 +37,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/jogos.html"
     }
   ]
 }
