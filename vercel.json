@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "api/matches.js",
       "use": "@vercel/node"
     },
     {
@@ -12,16 +12,12 @@
     {
       "src": "favicon.ico",
       "use": "@vercel/static"
-    },
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
+      "src": "/api/matches",
+      "dest": "/api/matches.js"
     },
     {
       "src": "/favicon.ico",
@@ -30,10 +26,6 @@
     {
       "src": "/(.*)\\.html",
       "dest": "/$1.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     },
     {
       "src": "/(.*)",

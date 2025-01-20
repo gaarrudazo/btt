@@ -298,17 +298,21 @@
         });
 
         /**
-         * Função para buscar próximos jogos.
+         * Função para buscar dados da API.
+         * @param {string} type - Tipo de requisição ('next' ou 'live').
          * @param {string} leagueId - ID da liga.
-         * @param {string} season - Temporada.
+         * @param {string} season - Temporada (necessário apenas para 'next').
          */
-        const fetchNextMatches = async (leagueId, season) => {
-            if (!leagueId || !season) {
-                alert('Por favor, selecione uma liga.');
+        const fetchMatches = async (type, leagueId, season = null) => {
+            if (!type || !leagueId || (type === 'next' && !season)) {
+                alert('Parâmetros insuficientes para a requisição.');
                 return;
             }
 
-            const url = `/api/next-matches?leagueId=${leagueId}&season=${season}`;
+            let url = `/api/matches?type=${type}&leagueId=${leagueId}`;
+            if (type === 'next') {
+                url += `&season=${season}`;
+            }
 
             try {
                 const response = await fetch(url);
@@ -318,39 +322,12 @@
                 }
 
                 const data = await response.json();
-                console.log('Próximos Jogos:', data);
-                displayMatches(data.data, 'next'); // Ajuste conforme a estrutura da resposta da API
+                console.log(`${type === 'next' ? 'Próximos Jogos' : 'Placar Ao Vivo'}:`, data);
+                displayMatches(data.data, type);
             } catch (error) {
-                console.error('Erro ao buscar próximos jogos:', error);
-                document.getElementById('matches-container-next').innerHTML = `<p class="error-message">Ocorreu um erro ao buscar próximos jogos: ${error.message}</p>`;
-            }
-        };
-
-        /**
-         * Função para buscar placares ao vivo.
-         * @param {string} leagueId - ID da liga.
-         */
-        const fetchLiveScores = async (leagueId) => {
-            if (!leagueId) {
-                alert('Por favor, selecione uma liga.');
-                return;
-            }
-
-            const url = `/api/live-scores?leagueId=${leagueId}`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Erro: ${response.status} ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log('Placar Ao Vivo:', data);
-                displayMatches(data.data, 'live'); // Ajuste conforme a estrutura da resposta da API
-            } catch (error) {
-                console.error('Erro ao buscar placares ao vivo:', error);
-                document.getElementById('matches-container-live').innerHTML = `<p class="error-message">Ocorreu um erro ao buscar placares ao vivo: ${error.message}</p>`;
+                console.error(`Erro ao buscar ${type === 'next' ? 'próximos jogos' : 'placares ao vivo'}:`, error);
+                const containerId = type === 'next' ? 'matches-container-next' : 'matches-container-live';
+                document.getElementById(containerId).innerHTML = `<p class="error-message">Ocorreu um erro ao buscar ${type === 'next' ? 'próximos jogos' : 'placares ao vivo'}: ${error.message}</p>`;
             }
         };
 
@@ -369,6 +346,7 @@
             }
 
             matches.forEach(match => {
+                // Ajuste a estrutura conforme a resposta da API
                 const matchDate = new Date(match.utcDate);
                 const hours = matchDate.getHours().toString().padStart(2, '0');
                 const minutes = matchDate.getMinutes().toString().padStart(2, '0');
@@ -378,23 +356,33 @@
                 const matchCard = document.createElement('div');
                 matchCard.classList.add('match-card');
 
+                // Verifica se as informações estão disponíveis e utiliza placeholders se necessário
+                const competitionName = match.competition && match.competition.name ? match.competition.name : 'Competição';
+                const localTeamName = match.localteam && match.localteam.name ? match.localteam.name : 'Time Local';
+                const visitorTeamName = match.visitorteam && match.visitorteam.name ? match.visitorteam.name : 'Time Visitante';
+                const localTeamLogo = match.localteam && match.localteam.logo_path ? match.localteam.logo_path : 'https://via.placeholder.com/30';
+                const visitorTeamLogo = match.visitorteam && match.visitorteam.logo_path ? match.visitorteam.logo_path : 'https://via.placeholder.com/30';
+                const scores = match.scores && match.scores.ft_home !== null && match.scores.ft_away !== null
+                    ? `<div class="match-score">Placar: ${match.scores.ft_home} - ${match.scores.ft_away}</div>`
+                    : '';
+
                 matchCard.innerHTML = `
-                    <h3>${match.competition.name}</h3>
+                    <h3>${competitionName}</h3>
                     <div class="match-details">
                         <div class="team">
-                            <img src="${match.localteam.logo_path || 'https://via.placeholder.com/30'}" alt="${match.localteam.name}">
-                            <span>${match.localteam.name}</span>
+                            <img src="${localTeamLogo}" alt="${localTeamName}">
+                            <span>${localTeamName}</span>
                         </div>
                         <span>VS</span>
                         <div class="team">
-                            <img src="${match.visitorteam.logo_path || 'https://via.placeholder.com/30'}" alt="${match.visitorteam.name}">
-                            <span>${match.visitorteam.name}</span>
+                            <img src="${visitorTeamLogo}" alt="${visitorTeamName}">
+                            <span>${visitorTeamName}</span>
                         </div>
                     </div>
                     <div class="match-time">
                         <i class="fas fa-clock"></i> ${date} ${time} 
                     </div>
-                    ${type === 'live' && match.scores ? `<div class="match-score">Placar: ${match.scores.ft_home} - ${match.scores.ft_away}</div>` : ''}
+                    ${type === 'live' ? scores : ''}
                 `;
 
                 container.appendChild(matchCard);
@@ -408,7 +396,7 @@
             const season = new Date().getFullYear(); // Temporada atual
 
             if (leagueId) {
-                fetchNextMatches(leagueId, season);
+                fetchMatches('next', leagueId, season);
             } else {
                 alert('Por favor, selecione uma liga.');
             }
@@ -420,7 +408,7 @@
             const leagueId = leagueSelect.value;
 
             if (leagueId) {
-                fetchLiveScores(leagueId);
+                fetchMatches('live', leagueId);
             } else {
                 alert('Por favor, selecione uma liga.');
             }
